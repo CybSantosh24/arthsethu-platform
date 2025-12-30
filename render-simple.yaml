@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: arthsethu-platform
+    plan: free
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx512m -XX:MaxMetaspaceSize=128m
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: arthsethu-db
+    databaseName: arthsethu
+    user: arthsethu_user
+    plan: free
