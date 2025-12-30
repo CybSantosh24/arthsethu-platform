@@ -94,7 +94,7 @@ run-demo.bat
 CREATE DATABASE arthsethu;
 
 -- The application will auto-create tables on first run
--- Default credentials: postgres/mpvsSQL216
+-- Default credentials: postgres/asdf1234
 ```
 
 ## 📱 Demo URLs

@@ -1,17 +1,30 @@
 services:
+  # Main ArthSethu Spring Boot Application
   - type: web
     name: arthsethu-platform
-    env: java
+    runtime: java
     plan: free
+    region: oregon
+    branch: main
     buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=production -jar target/*.jar
+    healthCheckPath: /actuator/health
     envVars:
+      # Java Configuration
       - key: JAVA_TOOL_OPTIONS
-        value: -Xmx512m
+        value: -Xmx512m -XX:MaxMetaspaceSize=128m
       - key: SPRING_PROFILES_ACTIVE
         value: production
+      
+      # Database Configuration (will be auto-populated by Render)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: arthsethu-db
+          property: connectionString
       - key: DB_NAME
-        value: arthsethu
+        fromDatabase:
+          name: arthsethu-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
           name: arthsethu-db
@@ -20,29 +33,48 @@ services:
         fromDatabase:
           name: arthsethu-db
           property: password
-      - key: DATABASE_URL
-        fromDatabase:
-          name: arthsethu-db
-          property: connectionString
+      
+      # API Keys (set these in Render dashboard)
       - key: LANGCHAIN_API_KEY
-        value: demo-key-replace-with-real
+        value: demo-key-replace-in-render-dashboard
       - key: GOVERNMENT_API_KEY
-        value: demo-key-replace-with-real
+        value: demo-key-replace-in-render-dashboard
+      
+      # Email Configuration (set these in Render dashboard)
       - key: EMAIL_USERNAME
         value: demo@arthsethu.com
       - key: EMAIL_PASSWORD
-        value: demo-password
+        value: demo-password-replace-in-render-dashboard
       - key: EMAIL_FROM
         value: demo@arthsethu.com
+      
+      # Security Configuration
       - key: JWT_SECRET
         generateValue: true
+      
+      # AI Configuration (optional - for local AI)
       - key: OLLAMA_BASE_URL
         value: http://localhost:11434
       - key: OLLAMA_MODEL
         value: llama3.2
+      
+      # Government API URLs
+      - key: CONSUMER_AFFAIRS_API_URL
+        value: https://data.gov.in/api/datastore/resource.json
+      - key: LABOR_MINISTRY_API_URL
+        value: https://labour.gov.in/api
+      
+      # SMTP Configuration
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
 
 databases:
+  # PostgreSQL Database for ArthSethu
   - name: arthsethu-db
     databaseName: arthsethu
     user: arthsethu_user
     plan: free
+    region: oregon
+    ipAllowList: []
