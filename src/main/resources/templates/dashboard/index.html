@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ArthSethu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #1d4ed8;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            color: #e2e8f0;
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-header h1 {
+            color: #3b82f6;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .hero-text {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+        
+        .tier-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .tier-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tier-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+        }
+        
+        .tier-card.current {
+            border-color: #fbbf24;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+        }
+        
+        .tier-name {
+            color: #3b82f6;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .tier-price {
+            font-size: 1.4rem;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .tier-features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .tier-features li {
+            padding: 8px 0;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        
+        .tier-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .tier-features li.available {
+            color: #10b981;
+        }
+        
+        .tier-features li.unavailable {
+            color: #64748b;
+            text-decoration: line-through;
+        }
+        
+        .tier-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .tier-button:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .tier-button.current {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #0f172a;
+            cursor: default;
+        }
+        
+        .tier-button.current:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+        
+        .quick-actions {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-actions h2 {
+            color: #3b82f6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-button {
+            background: rgba(59, 130, 246, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 15px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .action-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .action-button.disabled {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+            cursor: not-allowed;
+            border-color: rgba(100, 116, 139, 0.3);
+        }
+        
+        .action-button.disabled:hover {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+            border-color: rgba(100, 116, 139, 0.3);
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .latest-metrics {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .latest-metrics h2 {
+            color: #3b82f6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        /* Payment Simulation Styles */
+        .payment-simulation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .simulation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .simulation-modal {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10001;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .simulation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .simulation-header h3 {
+            color: #3b82f6;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .payment-option.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+        
+        .payment-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .payment-details h4 {
+            color: #e2e8f0;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .payment-details p {
+            color: #94a3b8;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .payment-form {
+            margin-top: 1.5rem;
+        }
+        
+        .payment-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .payment-form label {
+            display: block;
+            color: #e2e8f0;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .payment-form input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        
+        .simulation-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .simulate-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .simulate-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+        }
+        
+        .cancel-btn {
+            flex: 1;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+            
+            .tier-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>ArthSethu Dashboard</h1>
+            <p class="hero-text">Don't just dream. Calculate.</p>
+            <p>Welcome back, <span th:text="${user.email}">user@example.com</span></p>
+        </div>
+        
+        <!-- Current Tier and Upgrade Options -->
+        <div class="tier-cards">
+            <div class="tier-card" th:classappend="${user.tier.name() == 'AARAMBH'} ? 'current' : ''">
+                <div class="tier-name">Aarambh</div>
+                <div class="tier-price">Free</div>
+                <ul class="tier-features">
+                    <li class="available">Feasibility Analysis</li>
+                    <li class="available">PDF Reports</li>
+                    <li class="available">Basic Business Profiling</li>
+                    <li class="unavailable">Daily Health Scoring</li>
+                    <li class="unavailable">AI CFO Advisor</li>
+                </ul>
+                <a href="#" class="tier-button" th:classappend="${user.tier.name() == 'AARAMBH'} ? 'current' : ''"
+                   th:text="${user.tier.name() == 'AARAMBH'} ? 'Current Plan' : 'Downgrade'">Current Plan</a>
+            </div>
+            
+            <div class="tier-card" th:classappend="${user.tier.name() == 'VISTAR'} ? 'current' : ''">
+                <div class="tier-name">Vistar</div>
+                <div class="tier-price">₹499/month</div>
+                <ul class="tier-features">
+                    <li class="available">Everything in Aarambh</li>
+                    <li class="available">Daily Metrics Logging</li>
+                    <li class="available">Health Score Dashboard</li>
+                    <li class="available">30-Day Trend Analysis</li>
+                    <li class="unavailable">AI CFO Advisor</li>
+                </ul>
+                <a href="#" onclick="openPaymentSimulation('VISTAR', '₹499/month')" 
+                   class="tier-button" th:classappend="${user.tier.name() == 'VISTAR'} ? 'current' : ''"
+                   th:text="${user.tier.name() == 'VISTAR'} ? 'Go to Dashboard' : 'Upgrade to Vistar'"
+                   th:href="${user.tier.name() == 'VISTAR'} ? '/dashboard/vistar' : '#'">Upgrade to Vistar</a>
+            </div>
+            
+            <div class="tier-card" th:classappend="${user.tier.name() == 'SHIKHAR'} ? 'current' : ''">
+                <div class="tier-name">Shikhar</div>
+                <div class="tier-price">₹999/month</div>
+                <ul class="tier-features">
+                    <li class="available">Everything in Vistar</li>
+                    <li class="available">AI CFO Advisor</li>
+                    <li class="available">What-if Simulations</li>
+                    <li class="available">Advanced Analytics</li>
+                    <li class="available">Strategic Recommendations</li>
+                </ul>
+                <a href="#" onclick="openPaymentSimulation('SHIKHAR', '₹999/month')" 
+                   class="tier-button" th:classappend="${user.tier.name() == 'SHIKHAR'} ? 'current' : ''"
+                   th:text="${user.tier.name() == 'SHIKHAR'} ? 'Go to Analytics' : 'Upgrade to Shikhar'"
+                   th:href="${user.tier.name() == 'SHIKHAR'} ? '/dashboard/analytics' : '#'">Upgrade to Shikhar</a>
+            </div>
+        </div>
+        
+        <!-- Payment Simulation Modal -->
+        <div class="payment-simulation" id="paymentSimulation" style="display: none;">
+            <div class="simulation-overlay" onclick="closePaymentSimulation()"></div>
+            <div class="simulation-modal">
+                <div class="simulation-header">
+                    <h3>💳 Payment Simulation</h3>
+                    <button class="close-btn" onclick="closePaymentSimulation()">×</button>
+                </div>
+                <div class="simulation-content">
+                    <p>Experience our premium features with a simulated payment process.</p>
+                    
+                    <div class="payment-options">
+                        <div class="payment-option" onclick="selectPaymentMethod('card')">
+                            <div class="payment-icon">💳</div>
+                            <div class="payment-details">
+                                <h4>Credit/Debit Card</h4>
+                                <p>Secure payment via Razorpay</p>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-option" onclick="selectPaymentMethod('upi')">
+                            <div class="payment-icon">📱</div>
+                            <div class="payment-details">
+                                <h4>UPI Payment</h4>
+                                <p>Pay using any UPI app</p>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-option" onclick="selectPaymentMethod('netbanking')">
+                            <div class="payment-icon">🏦</div>
+                            <div class="payment-details">
+                                <h4>Net Banking</h4>
+                                <p>Direct bank transfer</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-form" id="paymentForm" style="display: none;">
+                        <div class="form-group">
+                            <label>Selected Plan</label>
+                            <input type="text" id="selectedPlan" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="text" id="paymentAmount" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <input type="text" id="paymentMethod" readonly>
+                        </div>
+                        
+                        <div class="simulation-actions">
+                            <button class="simulate-btn" onclick="processPayment()">
+                                🔄 Simulate Payment
+                            </button>
+                            <button class="cancel-btn" onclick="closePaymentSimulation()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="/onboarding" class="action-button">
+                    Complete Business Profile
+                </a>
+                <a href="/reports" class="action-button">
+                    Generate Feasibility Report
+                </a>
+                <a th:href="${user.tier.ordinal >= 1} ? '/dashboard/metrics' : '#'" 
+                   class="action-button" th:classappend="${user.tier.ordinal < 1} ? 'disabled' : ''">
+                    Log Daily Metrics
+                </a>
+                <a th:href="${user.tier.ordinal >= 1} ? '/dashboard/health-score' : '#'" 
+                   class="action-button" th:classappend="${user.tier.ordinal < 1} ? 'disabled' : ''">
+                    View Health Score
+                </a>
+                <a th:href="${user.tier.ordinal >= 2} ? '/ai-cfo' : '#'" 
+                   class="action-button" th:classappend="${user.tier.ordinal < 2} ? 'disabled' : ''">
+                    Ask AI CFO
+                </a>
+            </div>
+        </div>
+        
+        <!-- Latest Metrics (if available) -->
+        <div class="latest-metrics" th:if="${latestMetrics != null}">
+            <h2>Latest Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(latestMetrics.sales, 0, 2)}">₹0</div>
+                    <div class="metric-label">Sales</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(latestMetrics.expenses, 0, 2)}">₹0</div>
+                    <div class="metric-label">Expenses</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(latestMetrics.wastage, 0, 2)}">₹0</div>
+                    <div class="metric-label">Wastage</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="${latestMetrics.healthScore}">0</div>
+                    <div class="metric-label">Health Score</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="${#numbers.formatDecimal(latestMetrics.margin * 100, 1, 1)} + '%'">0%</div>
+                    <div class="metric-label">Margin</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #ccc;">
+                Last updated: <span th:text="${#temporals.format(latestMetrics.date, 'MMM dd, yyyy')}">Today</span>
+            </p>
+        </div>
+        
+        <!-- Prompt to log metrics if Vistar+ user hasn't logged today -->
+        <div class="quick-actions" th:if="${user.tier.ordinal >= 1 and !hasLoggedToday}">
+            <h2>Daily Check-in</h2>
+            <p style="text-align: center; color: #ccc; margin-bottom: 20px;">
+                You haven't logged your metrics today. Track your business health by logging your daily sales, expenses, and wastage.
+            </p>
+            <div style="text-align: center;">
+                <a href="/dashboard/metrics" class="tier-button">Log Today's Metrics</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Payment Simulation JavaScript
+        let selectedPlan = '';
+        let selectedAmount = '';
+        let selectedPaymentMethod = '';
+        
+        function openPaymentSimulation(plan, amount) {
+            // Check if user is already on this tier
+            const currentTier = document.querySelector('.tier-card.current .tier-name').textContent;
+            if (currentTier === plan) {
+                // Redirect to appropriate dashboard
+                if (plan === 'VISTAR') {
+                    window.location.href = '/dashboard/vistar';
+                } else if (plan === 'SHIKHAR') {
+                    window.location.href = '/dashboard/analytics';
+                }
+                return;
+            }
+            
+            selectedPlan = plan;
+            selectedAmount = amount;
+            
+            document.getElementById('paymentSimulation').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePaymentSimulation() {
+            document.getElementById('paymentSimulation').style.display = 'none';
+            document.getElementById('paymentForm').style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Reset selections
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+        }
+        
+        function selectPaymentMethod(method) {
+            // Remove previous selections
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            event.target.closest('.payment-option').classList.add('selected');
+            
+            // Set payment method
+            const methodNames = {
+                'card': 'Credit/Debit Card',
+                'upi': 'UPI Payment',
+                'netbanking': 'Net Banking'
+            };
+            
+            selectedPaymentMethod = methodNames[method];
+            
+            // Show payment form
+            document.getElementById('selectedPlan').value = selectedPlan + ' Plan';
+            document.getElementById('paymentAmount').value = selectedAmount;
+            document.getElementById('paymentMethod').value = selectedPaymentMethod;
+            document.getElementById('paymentForm').style.display = 'block';
+        }
+        
+        function processPayment() {
+            // Show loading state
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '🔄 Processing...';
+            btn.disabled = true;
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                // Show success message
+                showPaymentSuccess();
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        function showPaymentSuccess() {
+            const modal = document.querySelector('.simulation-modal');
+            modal.innerHTML = `
+                <div class="simulation-header">
+                    <h3>✅ Payment Successful!</h3>
+                    <button class="close-btn" onclick="closePaymentSimulation()">×</button>
+                </div>
+                <div class="simulation-content" style="text-align: center;">
+                    <div style="font-size: 4rem; margin: 1rem 0;">🎉</div>
+                    <h4 style="color: #10b981; margin-bottom: 1rem;">Congratulations!</h4>
+                    <p style="margin-bottom: 1.5rem;">
+                        Your upgrade to <strong>${selectedPlan}</strong> has been processed successfully.
+                        This is a simulation - no actual payment was charged.
+                    </p>
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="color: #10b981; margin: 0; font-size: 0.9rem;">
+                            💡 In a real scenario, you would now have access to all ${selectedPlan} features including advanced analytics, AI insights, and premium support.
+                        </p>
+                    </div>
+                    <button class="tier-button" onclick="closePaymentSimulation()" style="margin-top: 1rem;">
+                        Continue to Dashboard
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('simulation-overlay')) {
+                closePaymentSimulation();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePaymentSimulation();
+            }
+        });
+        
+        // Dashboard initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ArthSethu Dashboard loaded');
+            
+            // Add hover effects to action buttons
+            const actionButtons = document.querySelectorAll('.action-button:not(.disabled)');
+            actionButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Add click handlers for disabled buttons
+            const disabledButtons = document.querySelectorAll('.action-button.disabled');
+            disabledButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showUpgradePrompt();
+                });
+            });
+        });
+        
+        function showUpgradePrompt() {
+            alert('This feature requires a higher tier subscription. Please upgrade your plan to access this functionality.');
+        }
+    </script>
+</body>
+</html>

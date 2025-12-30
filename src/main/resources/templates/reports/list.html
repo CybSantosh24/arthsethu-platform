@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">My Feasibility Reports</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin: 10px 0 0 0;
+        }
+
+        .main-content {
+            padding: 0;
+            min-height: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .report-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+        }
+
+        .report-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .report-title {
+            font-size: 1.4rem;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .report-location {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .report-details {
+            margin-bottom: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .value {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            margin: 30px 0;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .report-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">ArthSethu</h1>
+            <p class="tagline">Don't just dream. Calculate.</p>
+        </header>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h2 th:text="${pageTitle}">My Feasibility Reports</h2>
+                <p class="subtitle">Access and download your business feasibility reports</p>
+            </div>
+            
+            <div class="reports-grid" th:if="${reports != null and !reports.empty}">
+                <div class="report-card" th:each="report : ${reports}">
+                    <div class="report-header">
+                        <h3 class="report-title" th:text="${report.businessType}">Business Type</h3>
+                        <span class="report-location" th:text="${report.city}">City</span>
+                    </div>
+                    
+                    <div class="report-details">
+                        <div class="detail-item">
+                            <span class="label">Generated:</span>
+                            <span class="value" th:text="${#temporals.format(report.generatedAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                        </div>
+                        
+                        <div class="detail-item" th:if="${report.capex != null}">
+                            <span class="label">Investment:</span>
+                            <span class="value" th:text="'₹' + ${#numbers.formatInteger(report.capex, 0, 'COMMA')}">Amount</span>
+                        </div>
+                        
+                        <div class="detail-item" th:if="${report.breakEvenMonths != null}">
+                            <span class="label">Break-even:</span>
+                            <span class="value" th:text="${report.breakEvenMonths} + ' months'">Months</span>
+                        </div>
+                    </div>
+                    
+                    <div class="report-actions">
+                        <a th:href="@{/reports/{id}(id=${report.id})}" class="btn btn-primary">
+                            View Details
+                        </a>
+                        
+                        <a th:href="@{/reports/download/{id}(id=${report.id})}" 
+                           class="btn btn-secondary"
+                           th:if="${report.pdfContent != null}"
+                           download>
+                            📄 Download PDF
+                        </a>
+                        
+                        <span class="status-badge" th:unless="${report.pdfContent != null}">
+                            PDF Generating...
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-state" th:if="${reports == null or reports.empty}">
+                <div class="empty-icon">📊</div>
+                <h3>No Reports Yet</h3>
+                <p>Complete the onboarding questionnaire to generate your first feasibility report.</p>
+                <a href="/onboarding" class="btn btn-primary">Start Questionnaire</a>
+            </div>
+            
+            <div class="error-message" th:if="${error}">
+                <div class="alert alert-error">
+                    <strong>Error:</strong>
+                    <span th:text="${error}">Error message</span>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2024 ArthSethu. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

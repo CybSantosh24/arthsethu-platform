@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Error - ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .error-icon {
+            font-size: 64px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        .error-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        
+        .error-message {
+            font-size: 18px;
+            color: #cccccc;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .error-details {
+            margin-top: 40px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+            text-align: left;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .error-details h4 {
+            margin: 0 0 10px 0;
+            color: #dc3545;
+        }
+        
+        .error-details p {
+            margin: 0;
+            color: #cccccc;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .error-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">Admin Dashboard Error</h1>
+        <p class="error-message">
+            We encountered an issue while loading the admin dashboard. 
+            This could be due to a temporary system problem or connectivity issue.
+        </p>
+        
+        <div class="error-actions">
+            <a href="/admin/dashboard" class="btn btn-primary">Try Again</a>
+            <a href="/admin/system" class="btn btn-secondary">Check System Status</a>
+            <a href="/dashboard" class="btn btn-secondary">Back to App</a>
+        </div>
+        
+        <div th:if="${error}" class="error-details">
+            <h4>Error Details:</h4>
+            <p th:text="${error}">Error message will appear here</p>
+        </div>
+        
+        <div th:unless="${error}" class="error-details">
+            <h4>Troubleshooting Steps:</h4>
+            <p>1. Check if all system services are running</p>
+            <p>2. Verify database connectivity</p>
+            <p>3. Ensure proper admin permissions</p>
+            <p>4. Contact system administrator if issue persists</p>
+        </div>
+    </div>
+</body>
+</html>

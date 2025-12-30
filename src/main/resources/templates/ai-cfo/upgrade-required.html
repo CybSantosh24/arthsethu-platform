@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade Required - AI CFO - ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .upgrade-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .upgrade-card {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid #00d4aa;
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.2);
+        }
+        
+        .upgrade-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .upgrade-title {
+            color: #00d4aa;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .upgrade-subtitle {
+            color: #a0aec0;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .current-tier {
+            background: #4a5568;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #e53e3e;
+        }
+        
+        .current-tier h3 {
+            color: #e53e3e;
+            margin: 0 0 10px 0;
+        }
+        
+        .tier-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .tier-card {
+            background: #2d3748;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+        }
+        
+        .tier-card.recommended {
+            border-color: #00d4aa;
+            background: linear-gradient(135deg, #1a365d, #2d3748);
+        }
+        
+        .tier-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .tier-price {
+            font-size: 2rem;
+            color: #00d4aa;
+            margin-bottom: 15px;
+        }
+        
+        .tier-features {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        
+        .tier-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #4a5568;
+            color: #e2e8f0;
+        }
+        
+        .tier-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .tier-features li::before {
+            content: "✓ ";
+            color: #00d4aa;
+            font-weight: bold;
+        }
+        
+        .upgrade-btn {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 170, 0.4);
+        }
+        
+        .back-btn {
+            background: #4a5568;
+            color: #e2e8f0;
+            border: 1px solid #718096;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: #718096;
+            transform: translateY(-1px);
+        }
+        
+        .ai-features {
+            background: #1a365d;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #00d4aa;
+        }
+        
+        .ai-features h3 {
+            color: #00d4aa;
+            margin-top: 0;
+        }
+        
+        .ai-features ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        
+        .ai-features li {
+            padding: 8px 0;
+            color: #e2e8f0;
+        }
+        
+        .ai-features li::before {
+            content: "🤖 ";
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .upgrade-container {
+                padding: 20px 10px;
+            }
+            
+            .upgrade-card {
+                padding: 30px 20px;
+            }
+            
+            .upgrade-title {
+                font-size: 2rem;
+            }
+            
+            .tier-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .upgrade-btn, .back-btn {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upgrade-container">
+        <div class="upgrade-card">
+            <div class="upgrade-icon">🚀</div>
+            <h1 class="upgrade-title">Unlock AI CFO</h1>
+            <p class="upgrade-subtitle">
+                Get personalized financial guidance and strategic insights powered by advanced AI
+            </p>
+            
+            <div class="current-tier">
+                <h3>Current Tier: <span th:text="${currentTier}"></span></h3>
+                <p>Upgrade to Shikhar tier to access AI CFO features</p>
+            </div>
+            
+            <div class="ai-features">
+                <h3>🤖 AI CFO Features</h3>
+                <ul>
+                    <li>Contextual financial analysis based on your business data</li>
+                    <li>What-if scenario simulations and projections</li>
+                    <li>Strategic recommendations for growth and optimization</li>
+                    <li>Real-time chat interface with intelligent responses</li>
+                    <li>Integration with your historical performance data</li>
+                </ul>
+            </div>
+            
+            <div class="tier-comparison">
+                <div class="tier-card">
+                    <div class="tier-name" style="color: #a0aec0;">Vistar Tier</div>
+                    <div class="tier-price">₹499/month</div>
+                    <ul class="tier-features">
+                        <li>Operational Dashboard</li>
+                        <li>Health Score Tracking</li>
+                        <li>30-day Trend Analysis</li>
+                        <li>Daily Metrics Logging</li>
+                    </ul>
+                </div>
+                
+                <div class="tier-card recommended">
+                    <div class="tier-name" style="color: #00d4aa;">Shikhar Tier ⭐</div>
+                    <div class="tier-price">₹999/month</div>
+                    <ul class="tier-features">
+                        <li>Everything in Vistar</li>
+                        <li>AI CFO Chat Interface</li>
+                        <li>What-if Simulations</li>
+                        <li>Strategic Recommendations</li>
+                        <li>Advanced Analytics</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <a href="/subscription/upgrade?tier=SHIKHAR" class="upgrade-btn">
+                    🚀 Upgrade to Shikhar - ₹999/month
+                </a>
+                <br>
+                <a href="/dashboard" class="back-btn">
+                    ← Back to Dashboard
+                </a>
+            </div>
+            
+            <div style="margin-top: 20px; color: #a0aec0; font-size: 0.9rem;">
+                <p>💡 <strong>Why upgrade?</strong></p>
+                <p>
+                    Our AI CFO analyzes your specific business data to provide personalized insights 
+                    that generic financial advice can't match. Make data-driven decisions with confidence.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - ArthSethu' : 'ArthSethu - Don\'t just dream. Calculate.'}">ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <th:block th:fragment="head-extra">
+        <!-- Additional head content can be inserted here -->
+    </th:block>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" th:fragment="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/}" class="brand-link">
+                    <span class="brand-logo">ArthSethu</span>
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="nav-menu">
+                <div class="nav-links">
+                    <a th:href="@{/}" class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">Home</a>
+                    
+                    <div sec:authorize="isAuthenticated()">
+                        <a th:href="@{/dashboard}" class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/dashboard') ? 'active' : ''}">Dashboard</a>
+                        <a th:href="@{/reports}" class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/reports') ? 'active' : ''}">Reports</a>
+                        
+                        <div sec:authorize="hasRole('ADMIN')">
+                            <a th:href="@{/admin}" class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin') ? 'active' : ''}">Admin</a>
+                        </div>
+                    </div>
+                    
+                    <div sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/onboarding}" class="nav-link btn-outline">Get Started</a>
+                        <a th:href="@{/login}" class="nav-link">Login</a>
+                    </div>
+                    
+                    <div sec:authorize="isAuthenticated()" class="nav-user">
+                        <div class="user-menu">
+                            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                                <span sec:authentication="name">User</span>
+                                <svg class="user-menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </button>
+                            <div class="user-menu-dropdown" id="user-menu-dropdown">
+                                <a th:href="@{/profile}" class="user-menu-item">Profile</a>
+                                <a th:href="@{/subscription}" class="user-menu-item">Subscription</a>
+                                <hr class="user-menu-divider">
+                                <form th:action="@{/logout}" method="post" class="logout-form">
+                                    <button type="submit" class="user-menu-item logout-btn">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-toggle" onclick="toggleMobileMenu()">
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <th:block th:fragment="content">
+            <!-- Page content goes here -->
+        </th:block>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" th:fragment="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>ArthSethu</h4>
+                    <p>Don't just dream. Calculate.</p>
+                    <p>Your Digital Co-Founder for Financial Intelligence</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#help">Help Center</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#privacy">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ArthSethu. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/app.js}"></script>
+    <th:block th:fragment="scripts">
+        <!-- Additional scripts can be inserted here -->
+    </th:block>
+</body>
+</html>

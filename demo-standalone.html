@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArthSethu Demo - Standalone</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-midnight: #0f172a;
+            --neon-blue: #3b82f6;
+            --gold-amber: #fbbf24;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--deep-midnight) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--gold-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .feature-status {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .demo-content {
+            display: none;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .demo-content.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: var(--glass-white);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 2rem;
+            width: auto;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .demo-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div id="homeView">
+            <div class="demo-header">
+                <h1 class="demo-title">🚀 ArthSethu Platform</h1>
+                <p class="demo-subtitle">AI-Powered Business Intelligence & Financial Advisory</p>
+                <div class="demo-badge">✨ Interactive Demo - All Features Working</div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Smart Onboarding</h3>
+                    <div class="feature-status">✅ Fully Functional</div>
+                    <p class="feature-description">
+                        Dynamic questionnaire that adapts to your business type with intelligent form validation and progress tracking.
+                    </p>
+                    <button class="btn btn-primary" onclick="showDemo('onboarding')">
+                        Try Onboarding Demo
+                    </button>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI CFO Assistant</h3>
+                    <div class="feature-status">✅ Fully Functional</div>
+                    <p class="feature-description">
+                        AI-powered financial advisor with intelligent responses, business insights, and strategic recommendations.
+                    </p>
+                    <button class="btn btn-primary" onclick="showDemo('ai-cfo')">
+                        Chat with AI CFO
+                    </button>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Business Dashboard</h3>
+                    <div class="feature-status">✅ Fully Functional</div>
+                    <p class="feature-description">
+                        Real-time metrics, health score tracking, and interactive charts with live data visualization.
+                    </p>
+                    <button class="btn btn-primary" onclick="showDemo('dashboard')">
+                        View Dashboard
+                    </button>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Feasibility Reports</h3>
+                    <div class="feature-status">✅ Fully Functional</div>
+                    <p class="feature-description">
+                        Professional PDF reports with financial analysis, market insights, and downloadable documents.
+                    </p>
+                    <button class="btn btn-primary" onclick="showDemo('reports')">
+                        Generate Reports
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Demo -->
+        <div id="onboardingDemo" class="demo-content">
+            <button class="btn back-btn" onclick="showHome()">← Back to Home</button>
+            <iframe src="src/main/resources/templates/demo/onboarding.html" 
+                    style="width: 100%; height: 600px; border: none; border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- AI CFO Demo -->
+        <div id="ai-cfoDemo" class="demo-content">
+            <button class="btn back-btn" onclick="showHome()">← Back to Home</button>
+            <iframe src="src/main/resources/templates/demo/ai-cfo.html" 
+                    style="width: 100%; height: 600px; border: none; border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- Dashboard Demo -->
+        <div id="dashboardDemo" class="demo-content">
+            <button class="btn back-btn" onclick="showHome()">← Back to Home</button>
+            <iframe src="src/main/resources/templates/demo/dashboard.html" 
+                    style="width: 100%; height: 600px; border: none; border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- Reports Demo -->
+        <div id="reportsDemo" class="demo-content">
+            <button class="btn back-btn" onclick="showHome()">← Back to Home</button>
+            <iframe src="src/main/resources/templates/demo/reports.html" 
+                    style="width: 100%; height: 600px; border: none; border-radius: 12px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function showDemo(demoType) {
+            // Hide home view
+            document.getElementById('homeView').style.display = 'none';
+            
+            // Hide all demo content
+            const demoContents = document.querySelectorAll('.demo-content');
+            demoContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected demo
+            const selectedDemo = document.getElementById(demoType + 'Demo');
+            if (selectedDemo) {
+                selectedDemo.classList.add('active');
+            }
+        }
+
+        function showHome() {
+            // Show home view
+            document.getElementById('homeView').style.display = 'block';
+            
+            // Hide all demo content
+            const demoContents = document.querySelectorAll('.demo-content');
+            demoContents.forEach(content => {
+                content.classList.remove('active');
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ArthSethu Standalone Demo loaded');
+        });
+    </script>
+</body>
+</html>

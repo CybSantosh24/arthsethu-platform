@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistar Dashboard - ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/charts.js}"></script>
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-header h1 {
+            color: #00d4aa;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.1);
+            border: 1px solid #333;
+        }
+        
+        .card-title {
+            color: #00d4aa;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .health-score-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+        
+        .health-score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .health-score-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+        
+        .health-score-label {
+            font-size: 1rem;
+            color: #ccc;
+        }
+        
+        .metrics-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #00d4aa;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #333;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #00d4aa, #00a085);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .trend-chart-container {
+            grid-column: 1 / -1;
+            height: 400px;
+        }
+        
+        .recommendation-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border-left: 4px solid #00d4aa;
+        }
+        
+        .recommendation-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        
+        .metrics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .alert-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+            
+            .health-score-container {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .health-score-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Vistar Dashboard</h1>
+            <p>Welcome back, <span th:text="${user.email}">user@example.com</span></p>
+        </div>
+        
+        <!-- Success message for metrics submission -->
+        <div id="success-alert" class="alert alert-success" style="display: none;">
+            <span id="success-message">Metrics saved successfully!</span>
+        </div>
+        
+        <!-- Info message if already logged today -->
+        <div th:if="${hasLoggedToday}" class="alert alert-info">
+            You've already logged your metrics for today. You can update them using the form below.
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Health Score Gauge -->
+            <div class="dashboard-card">
+                <h2 class="card-title">Health Score</h2>
+                <div class="health-score-container">
+                    <canvas id="healthScoreGauge"></canvas>
+                    <div class="health-score-value">
+                        <div class="health-score-number" th:text="${healthScore.currentHealthScore ?: 0}">0</div>
+                        <div class="health-score-label">Health Score</div>
+                    </div>
+                </div>
+                
+                <div class="metrics-summary" th:if="${healthScore.currentHealthScore != null}">
+                    <div class="metric-item">
+                        <div class="metric-value" th:text="${#numbers.formatDecimal(healthScore.averageMargin * 100, 1, 1)} + '%'">0%</div>
+                        <div class="metric-label">Avg Margin</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" th:text="${#numbers.formatDecimal(healthScore.averageWastagePercentage * 100, 1, 1)} + '%'">0%</div>
+                        <div class="metric-label">Avg Wastage</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" th:text="${healthScore.trend}">STABLE</div>
+                        <div class="metric-label">Trend</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daily Metrics Input -->
+            <div class="dashboard-card">
+                <h2 class="card-title">Log Today's Metrics</h2>
+                <form id="metricsForm" class="metrics-form">
+                    <div class="form-group">
+                        <label for="sales">Sales (₹)</label>
+                        <input type="number" id="sales" name="sales" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expenses">Expenses (₹)</label>
+                        <input type="number" id="expenses" name="expenses" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="wastage">Wastage (₹)</label>
+                        <input type="number" id="wastage" name="wastage" step="0.01" min="0" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Log Metrics
+                    </button>
+                </form>
+            </div>
+            
+            <!-- 30-Day Trend Chart -->
+            <div class="dashboard-card trend-chart-container">
+                <h2 class="card-title">30-Day Health Score Trend</h2>
+                <canvas id="trendChart"></canvas>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="dashboard-card recommendation-card" th:if="${healthScore.recommendation != null}">
+                <h2 class="card-title">Recommendations</h2>
+                <p class="recommendation-text" th:text="${healthScore.recommendation}">
+                    Start logging daily metrics to receive personalized recommendations.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">
+        // Health Score Data from server
+        const healthScoreData = /*[[${healthScore}]]*/ {};
+        const trendData = /*[[${trendData}]]*/ [];
+        
+        // Create Health Score Gauge
+        function createHealthScoreGauge() {
+            const currentScore = healthScoreData.currentHealthScore || 0;
+            ArthSethuCharts.createHealthScoreGauge('healthScoreGauge', currentScore);
+        }
+        
+        // Create Trend Chart
+        function createTrendChart() {
+            if (trendData.length === 0) return;
+            
+            const labels = trendData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }).reverse();
+            
+            const healthScores = trendData.map(item => item.healthScore).reverse();
+            
+            ArthSethuCharts.createRevenueTrendChart('trendChart', {
+                labels: labels,
+                revenue: healthScores
+            }, {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Health Score',
+                            color: ArthSethuCharts.colors.success
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Handle form submission
+        document.getElementById('metricsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successAlert = document.getElementById('success-alert');
+            const successMessage = document.getElementById('success-message');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/dashboard/metrics', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successMessage.textContent = `Metrics saved! Health Score: ${result.healthScore}`;
+                    successAlert.style.display = 'block';
+                    
+                    // Refresh the page after a short delay to show updated data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error saving metrics: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Log Metrics';
+            }
+        });
+        
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createHealthScoreGauge();
+            if (trendData.length > 0) {
+                createTrendChart();
+            }
+        });
+    </script>
+</body>
+</html>

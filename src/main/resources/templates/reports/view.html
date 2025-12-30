@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Feasibility Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin: 10px 0 0 0;
+        }
+
+        .main-content {
+            padding: 40px 0;
+            min-height: 60vh;
+        }
+
+        .breadcrumb {
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .report-summary {
+            background: #2c3e50;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .report-summary .report-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 20px;
+        }
+
+        .report-summary .report-title {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+        }
+
+        .location-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            color: #ecf0f1;
+        }
+
+        /* Key Metrics */
+        .key-metrics {
+            margin-bottom: 40px;
+        }
+
+        .key-metrics h3 {
+            color: #ecf0f1;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        /* Financial Visualizations */
+        .financial-charts {
+            margin-bottom: 40px;
+        }
+
+        .financial-charts h3 {
+            color: #ecf0f1;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: #2c3e50;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #34495e;
+        }
+
+        .chart-container h4 {
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-wrapper canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            margin-bottom: 40px;
+        }
+
+        .executive-summary h3 {
+            color: #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .summary-content {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #ecf0f1;
+        }
+
+        /* Download Section */
+        .download-section {
+            margin-bottom: 40px;
+        }
+
+        .download-section h3 {
+            color: #ecf0f1;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .download-card, .generating-card {
+            background: #34495e;
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .download-info, .generating-info {
+            flex: 1;
+        }
+
+        .download-info h4, .generating-info h4 {
+            color: #ecf0f1;
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .download-info p, .generating-info p {
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .report-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .report-features li {
+            color: #bdc3c7;
+            padding: 4px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .report-features li:before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .download-action, .generating-action {
+            text-align: center;
+        }
+
+        .download-note {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #34495e;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .btn-outline:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-large {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Error and Alert Styles */
+        .error-message {
+            margin: 30px 0;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid #333;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .download-card, .generating-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .report-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 250px;
+            }
+            
+            .chart-container {
+                padding: 20px;
+            }
+
+            .report-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">ArthSethu</h1>
+            <p class="tagline">Don't just dream. Calculate.</p>
+        </header>
+        
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="/reports">← Back to Reports</a>
+            </div>
+            
+            <div class="report-summary" th:if="${report}">
+                <div class="report-header">
+                    <h2 class="report-title">
+                        <span th:text="${report.businessType}">Business Type</span>
+                        <span class="location-badge" th:text="${report.city}">City</span>
+                    </h2>
+                    <div class="report-meta">
+                        <span class="meta-item">
+                            <strong>Report ID:</strong> <span th:text="${report.id}">ID</span>
+                        </span>
+                        <span class="meta-item">
+                            <strong>Generated:</strong> 
+                            <span th:text="${#temporals.format(report.generatedAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="key-metrics" th:if="${report.capex != null or report.opex != null}">
+                    <h3>Key Financial Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card" th:if="${report.capex != null}">
+                            <div class="metric-value" th:text="'₹' + ${#numbers.formatInteger(report.capex, 0, 'COMMA')}">
+                                Investment
+                            </div>
+                            <div class="metric-label">Total Investment (CAPEX)</div>
+                        </div>
+                        
+                        <div class="metric-card" th:if="${report.opex != null}">
+                            <div class="metric-value" th:text="'₹' + ${#numbers.formatInteger(report.opex, 0, 'COMMA')}">
+                                Operating Cost
+                            </div>
+                            <div class="metric-label">Annual Operating Cost (OPEX)</div>
+                        </div>
+                        
+                        <div class="metric-card" th:if="${report.breakEvenPoint != null}">
+                            <div class="metric-value" th:text="'₹' + ${#numbers.formatInteger(report.breakEvenPoint, 0, 'COMMA')}">
+                                Break-even
+                            </div>
+                            <div class="metric-label">Monthly Revenue Required</div>
+                        </div>
+                        
+                        <div class="metric-card" th:if="${report.breakEvenMonths != null}">
+                            <div class="metric-value" th:text="${report.breakEvenMonths}">
+                                Months
+                            </div>
+                            <div class="metric-label">Break-even Period</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Financial Visualizations -->
+                <div class="financial-charts" th:if="${report.capex != null and report.opex != null}">
+                    <h3>Financial Analysis</h3>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h4>CAPEX vs OPEX Breakdown</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="capexOpexChart" width="400" height="300"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" th:if="${report.breakEvenPoint != null}">
+                            <h4>Break-even Analysis</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="breakEvenChart" width="400" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="executive-summary" th:if="${report.executiveSummary}">
+                    <h3>Executive Summary</h3>
+                    <div class="summary-content" th:text="${report.executiveSummary}">
+                        Executive summary content
+                    </div>
+                </div>
+                
+                <div class="download-section">
+                    <h3>Download Report</h3>
+                    <div class="download-options">
+                        <div class="download-card" th:if="${canDownload}">
+                            <div class="download-info">
+                                <h4>Complete Feasibility Report</h4>
+                                <p>Comprehensive PDF report with detailed cost analysis, break-even projections, and strategic recommendations.</p>
+                                <ul class="report-features">
+                                    <li>Executive Summary</li>
+                                    <li>CAPEX vs OPEX Analysis with Charts</li>
+                                    <li>Break-even Analysis Graphs</li>
+                                    <li>Strategic Recommendations</li>
+                                    <li>Government Data Integration</li>
+                                </ul>
+                            </div>
+                            <div class="download-action">
+                                <a th:href="${downloadUrl}" 
+                                   class="btn btn-primary btn-large"
+                                   download>
+                                    <i class="icon-download"></i>
+                                    Download PDF Report
+                                </a>
+                                <p class="download-note">
+                                    File size: ~2-3 MB | Format: PDF
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="generating-card" th:unless="${canDownload}">
+                            <div class="generating-info">
+                                <h4>Report Generation in Progress</h4>
+                                <p>Your comprehensive feasibility report is being generated. This usually takes 30-60 seconds.</p>
+                                <div class="progress-indicator">
+                                    <div class="spinner"></div>
+                                    <span>Generating PDF...</span>
+                                </div>
+                            </div>
+                            <div class="generating-action">
+                                <button class="btn btn-secondary" onclick="location.reload()">
+                                    <i class="icon-refresh"></i>
+                                    Refresh Page
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-actions">
+                    <a href="/reports" class="btn btn-outline">
+                        ← Back to All Reports
+                    </a>
+                    
+                    <button class="btn btn-secondary" 
+                            th:onclick="'regenerateReport(' + ${report.id} + ')'">
+                        <i class="icon-refresh"></i>
+                        Regenerate Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="error-message" th:if="${error}">
+                <div class="alert alert-error">
+                    <strong>Error:</strong>
+                    <span th:text="${error}">Error message</span>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2024 ArthSethu. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // ArthSethu Chart.js Utilities
+        // Chart.js default configuration
+        Chart.defaults.color = '#bdc3c7';
+        Chart.defaults.borderColor = '#34495e';
+        Chart.defaults.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+
+        // Color palette for consistent theming
+        const ArthSethuColors = {
+            primary: '#3498db',
+            success: '#00d4aa',
+            warning: '#f39c12',
+            danger: '#e74c3c',
+            info: '#3498db',
+            light: '#ecf0f1',
+            dark: '#2c3e50',
+            muted: '#95a5a6',
+            
+            // Chart specific colors
+            capex: '#e74c3c',
+            opex: '#3498db',
+            revenue: '#00d4aa',
+            profit: '#27ae60',
+            loss: '#e74c3c',
+            neutral: '#95a5a6'
+        };
+
+        // CAPEX vs OPEX Pie Chart
+        function createCapexOpexChart(canvasId, capex, opex, options = {}) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+            
+            const total = capex + opex;
+            const capexPercentage = ((capex / total) * 100).toFixed(1);
+            const opexPercentage = ((opex / total) * 100).toFixed(1);
+            
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        `CAPEX (${capexPercentage}%)`,
+                        `OPEX (${opexPercentage}%)`
+                    ],
+                    datasets: [{
+                        data: [capex, opex],
+                        backgroundColor: [
+                            ArthSethuColors.capex,
+                            ArthSethuColors.opex
+                        ],
+                        borderColor: '#2c3e50',
+                        borderWidth: 2,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#ecf0f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 14,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const formatted = new Intl.NumberFormat('en-IN', {
+                                        style: 'currency',
+                                        currency: 'INR',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(value);
+                                    return `${label}: ${formatted}`;
+                                }
+                            },
+                            backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                            titleColor: '#ecf0f1',
+                            bodyColor: '#ecf0f1',
+                            borderColor: '#3498db',
+                            borderWidth: 1
+                        }
+                    },
+                    cutout: '60%',
+                    ...options
+                }
+            });
+        }
+
+        // Break-even Analysis Chart
+        function createBreakEvenChart(canvasId, data, options = {}) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.months,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: data.revenue,
+                        borderColor: ArthSethuColors.success,
+                        backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }, {
+                        label: 'Total Costs',
+                        data: data.costs,
+                        borderColor: ArthSethuColors.danger,
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }, {
+                        label: 'Break-even Point',
+                        data: data.breakEven,
+                        borderColor: ArthSethuColors.warning,
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#bdc3c7',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                            titleColor: '#ecf0f1',
+                            bodyColor: '#ecf0f1',
+                            borderColor: ArthSethuColors.primary,
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return `${context.dataset.label}: ₹${value.toLocaleString('en-IN')}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#34495e',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#bdc3c7'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Months',
+                                color: '#bdc3c7'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#34495e',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#bdc3c7',
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)',
+                                color: '#bdc3c7'
+                            }
+                        }
+                    },
+                    ...options
+                }
+            });
+        }
+
+        // Export chart functions
+        window.ArthSethuCharts = {
+            createCapexOpexChart,
+            createBreakEvenChart,
+            colors: ArthSethuColors
+        };
+    </script>
+    <script th:inline="javascript">
+        // Report data from server
+        const reportData = /*[[${report}]]*/ {};
+        
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (reportData && reportData.capex && reportData.opex) {
+                // Create CAPEX vs OPEX pie chart
+                ArthSethuCharts.createCapexOpexChart(
+                    'capexOpexChart',
+                    reportData.capex,
+                    reportData.opex
+                );
+                
+                // Create break-even analysis chart if data is available
+                if (reportData.breakEvenPoint && reportData.breakEvenMonths) {
+                    createBreakEvenAnalysis();
+                }
+            }
+        });
+        
+        function createBreakEvenAnalysis() {
+            const months = [];
+            const revenue = [];
+            const costs = [];
+            const breakEven = [];
+            
+            const monthlyRevenue = reportData.breakEvenPoint;
+            const monthlyOpex = reportData.opex / 12;
+            const totalCapex = reportData.capex;
+            
+            // Generate 24 months of data
+            for (let i = 1; i <= 24; i++) {
+                months.push(`Month ${i}`);
+                revenue.push(monthlyRevenue * i);
+                costs.push(totalCapex + (monthlyOpex * i));
+                breakEven.push(reportData.breakEvenPoint * reportData.breakEvenMonths);
+            }
+            
+            ArthSethuCharts.createBreakEvenChart('breakEvenChart', {
+                months: months,
+                revenue: revenue,
+                costs: costs,
+                breakEven: breakEven
+            });
+        }
+        
+        function regenerateReport(reportId) {
+            if (confirm('Are you sure you want to regenerate this report? This will create a new PDF with the latest data.')) {
+                fetch(`/api/reports/${reportId}/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Report regeneration started. Please refresh the page in a few moments.');
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        alert('Failed to regenerate report. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+        }
+        
+        // Auto-refresh if PDF is still generating
+        if (!document.querySelector('.download-card')) {
+            setTimeout(() => location.reload(), 10000); // Refresh every 10 seconds
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - ArthSethu Admin'">User Management - ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .admin-nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .admin-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: #333;
+            transition: background 0.3s;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            background: #007bff;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #2a2a2a;
+            color: #ffffff;
+        }
+        
+        .users-table {
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        
+        .table th {
+            background: #333;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .table td {
+            color: #cccccc;
+        }
+        
+        .tier-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .tier-aarambh {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .tier-vistar {
+            background: #007bff;
+            color: white;
+        }
+        
+        .tier-shikhar {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-banned {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .btn-ban {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-ban:hover {
+            background: #c82333;
+        }
+        
+        .btn-unban {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-unban:hover {
+            background: #218838;
+        }
+        
+        .btn-reset {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-reset:hover {
+            background: #e0a800;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            color: #ffffff;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #fff;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cccccc;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .admin-nav {
+                flex-wrap: wrap;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .table {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 10px 5px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <h1>User Management</h1>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/users" class="active">Users</a>
+                <a href="/admin/system">System</a>
+                <a href="/admin/revenue">Revenue</a>
+                <a href="/dashboard">Back to App</a>
+            </nav>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger" style="background: #dc3545; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <label for="tierFilter" style="color: #cccccc;">Filter by Tier:</label>
+            <select id="tierFilter" class="filter-select" onchange="filterByTier()">
+                <option value="">All Tiers</option>
+                <option th:each="tier : ${tiers}" 
+                        th:value="${tier}" 
+                        th:text="${tier}"
+                        th:selected="${selectedTier != null && selectedTier.equals(tier.toString())}">Tier</option>
+            </select>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Tier</th>
+                        <th>Status</th>
+                        <th>Business Type</th>
+                        <th>City</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.userId}">1</td>
+                        <td th:text="${user.email}">user@example.com</td>
+                        <td>
+                            <span class="tier-badge" 
+                                  th:classappend="'tier-' + ${user.tier.toString().toLowerCase()}"
+                                  th:text="${user.tier}">AARAMBH</span>
+                        </td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${user.banned} ? 'status-banned' : (${user.active} ? 'status-active' : 'status-inactive')"
+                                  th:text="${user.banned} ? 'BANNED' : (${user.active} ? 'ACTIVE' : 'INACTIVE')">ACTIVE</span>
+                        </td>
+                        <td th:text="${user.businessType ?: 'N/A'}">N/A</td>
+                        <td th:text="${user.city ?: 'N/A'}">N/A</td>
+                        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2024-01-01</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button th:if="${!user.banned}" 
+                                        class="btn btn-ban" 
+                                        th:onclick="'showBanModal(' + ${user.userId} + ', \'' + ${user.email} + '\')'">
+                                    Ban
+                                </button>
+                                <button th:if="${user.banned}" 
+                                        class="btn btn-unban" 
+                                        th:onclick="'unbanUser(' + ${user.userId} + ')'">
+                                    Unban
+                                </button>
+                                <button class="btn btn-reset" 
+                                        th:onclick="'resetPassword(' + ${user.userId} + ', \'' + ${user.email} + '\')'">
+                                    Reset Password
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div th:if="${#lists.isEmpty(users)}" style="text-align: center; padding: 40px; color: #cccccc;">
+                No users found.
+            </div>
+        </div>
+    </div>
+
+    <!-- Ban User Modal -->
+    <div id="banModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ban User</h3>
+                <span class="close" onclick="closeBanModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to ban user <strong id="banUserEmail"></strong>?</p>
+                <div class="form-group">
+                    <label for="banReason">Reason for ban:</label>
+                    <textarea id="banReason" rows="3" placeholder="Enter reason for banning this user..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeBanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmBan()">Ban User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Password Reset</h3>
+                <span class="close" onclick="closePasswordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>New temporary password for <strong id="resetUserEmail"></strong>:</p>
+                <div class="form-group">
+                    <input type="text" id="tempPassword" readonly style="font-family: monospace; font-size: 16px;">
+                </div>
+                <p style="color: #ffc107; font-size: 14px;">
+                    ⚠️ Please provide this password to the user securely. They should change it immediately after login.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closePasswordModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+
+        function filterByTier() {
+            const tierFilter = document.getElementById('tierFilter').value;
+            const url = new URL(window.location);
+            
+            if (tierFilter) {
+                url.searchParams.set('tier', tierFilter);
+            } else {
+                url.searchParams.delete('tier');
+            }
+            
+            window.location.href = url.toString();
+        }
+
+        function showBanModal(userId, email) {
+            currentUserId = userId;
+            document.getElementById('banUserEmail').textContent = email;
+            document.getElementById('banReason').value = '';
+            document.getElementById('banModal').style.display = 'block';
+        }
+
+        function closeBanModal() {
+            document.getElementById('banModal').style.display = 'none';
+            currentUserId = null;
+        }
+
+        function confirmBan() {
+            const reason = document.getElementById('banReason').value.trim();
+            
+            if (!reason) {
+                alert('Please provide a reason for banning this user.');
+                return;
+            }
+
+            if (currentUserId) {
+                banUser(currentUserId, reason);
+            }
+        }
+
+        function banUser(userId, reason) {
+            fetch(`/admin/users/${userId}/ban`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `reason=${encodeURIComponent(reason)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('User banned successfully');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+                closeBanModal();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while banning the user');
+                closeBanModal();
+            });
+        }
+
+        function unbanUser(userId) {
+            if (confirm('Are you sure you want to unban this user?')) {
+                fetch(`/admin/users/${userId}/unban`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('User unbanned successfully');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while unbanning the user');
+                });
+            }
+        }
+
+        function resetPassword(userId, email) {
+            if (confirm(`Are you sure you want to reset the password for ${email}?`)) {
+                fetch(`/admin/users/${userId}/reset-password`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('resetUserEmail').textContent = email;
+                        document.getElementById('tempPassword').value = data.tempPassword;
+                        document.getElementById('passwordModal').style.display = 'block';
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while resetting the password');
+                });
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const banModal = document.getElementById('banModal');
+            const passwordModal = document.getElementById('passwordModal');
+            
+            if (event.target === banModal) {
+                closeBanModal();
+            }
+            if (event.target === passwordModal) {
+                closePasswordModal();
+            }
+        }
+    </script>
+</body>
+</html>

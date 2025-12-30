@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Metrics - ArthSethu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .metrics-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #00d4aa;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .metrics-form-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid #333;
+        }
+        
+        .form-title {
+            color: #00d4aa;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .metrics-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #00d4aa;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input {
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #333;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.2);
+            background: #3a3a3a;
+        }
+        
+        .form-group .help-text {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #00d4aa, #00a085);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .alert-success {
+            background: rgba(0, 212, 170, 0.15);
+            border: 2px solid #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .alert-info {
+            background: rgba(52, 152, 219, 0.15);
+            border: 2px solid #3498db;
+            color: #3498db;
+        }
+        
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.15);
+            border: 2px solid #f39c12;
+            color: #f39c12;
+        }
+        
+        .current-metrics {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        
+        .current-metrics h2 {
+            color: #00d4aa;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .metrics-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        
+        .back-button {
+            background: #333;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #444;
+            border-color: #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .tips-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            padding: 30px;
+            border-left: 4px solid #00d4aa;
+            margin-bottom: 30px;
+        }
+        
+        .tips-card h3 {
+            color: #00d4aa;
+            margin-bottom: 15px;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            padding: 8px 0;
+            color: #ccc;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .tips-list li::before {
+            content: "💡 ";
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-form-card {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .metrics-display {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="metrics-container">
+        <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        
+        <div class="header">
+            <h1>Daily Metrics</h1>
+            <p>Track your daily business performance</p>
+        </div>
+        
+        <!-- Success message -->
+        <div id="success-alert" class="alert alert-success" style="display: none;">
+            <span id="success-message">Metrics saved successfully!</span>
+        </div>
+        
+        <!-- Info message if already logged today -->
+        <div th:if="${hasLoggedToday}" class="alert alert-info">
+            <strong>Already logged today!</strong> You can update your metrics for today using the form below.
+        </div>
+        
+        <!-- Current metrics display if available -->
+        <div class="current-metrics" th:if="${todayMetrics != null}">
+            <h2>Today's Current Metrics</h2>
+            <div class="metrics-display">
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(todayMetrics.sales, 0, 2)}">₹0</div>
+                    <div class="metric-label">Sales</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(todayMetrics.expenses, 0, 2)}">₹0</div>
+                    <div class="metric-label">Expenses</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(todayMetrics.wastage, 0, 2)}">₹0</div>
+                    <div class="metric-label">Wastage</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="${todayMetrics.healthScore}">0</div>
+                    <div class="metric-label">Health Score</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" th:text="${#numbers.formatDecimal(todayMetrics.margin * 100, 1, 1)} + '%'">0%</div>
+                    <div class="metric-label">Margin</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrics input form -->
+        <div class="metrics-form-card">
+            <h2 class="form-title" th:text="${hasLoggedToday} ? 'Update Today\'s Metrics' : 'Log Today\'s Metrics'">Log Today's Metrics</h2>
+            
+            <form id="metricsForm" class="metrics-form">
+                <div class="form-group">
+                    <label for="sales">Sales Amount (₹)</label>
+                    <input type="number" id="sales" name="sales" step="0.01" min="0" required 
+                           th:value="${todayMetrics != null} ? ${todayMetrics.sales} : ''">
+                    <div class="help-text">Total revenue generated today</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expenses">Expenses Amount (₹)</label>
+                    <input type="number" id="expenses" name="expenses" step="0.01" min="0" required
+                           th:value="${todayMetrics != null} ? ${todayMetrics.expenses} : ''">
+                    <div class="help-text">Total operational costs for today</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wastage">Wastage Amount (₹)</label>
+                    <input type="number" id="wastage" name="wastage" step="0.01" min="0" required
+                           th:value="${todayMetrics != null} ? ${todayMetrics.wastage} : ''">
+                    <div class="help-text">Value of wasted inventory or resources</div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span th:text="${hasLoggedToday} ? 'Update Metrics' : 'Save Metrics'">Save Metrics</span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Tips for better tracking -->
+        <div class="tips-card">
+            <h3>Tips for Accurate Tracking</h3>
+            <ul class="tips-list">
+                <li>Log your metrics at the end of each business day for consistency</li>
+                <li>Include all revenue sources in your sales figure</li>
+                <li>Count all operational expenses: rent, utilities, supplies, labor</li>
+                <li>Track wastage carefully - it directly impacts your health score</li>
+                <li>Be honest with your numbers to get accurate insights</li>
+                <li>Review your health score trends weekly to identify patterns</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Handle form submission
+        document.getElementById('metricsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successAlert = document.getElementById('success-alert');
+            const successMessage = document.getElementById('success-message');
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Saving...';
+            
+            // Hide any existing success message
+            successAlert.style.display = 'none';
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/dashboard/metrics', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message with health score
+                    successMessage.innerHTML = `
+                        <strong>Metrics saved successfully!</strong><br>
+                        Health Score: <strong>${result.healthScore}</strong> | 
+                        Margin: <strong>${(result.margin * 100).toFixed(1)}%</strong> | 
+                        Wastage: <strong>${(result.wastagePercentage * 100).toFixed(1)}%</strong>
+                    `;
+                    successAlert.style.display = 'block';
+                    
+                    // Scroll to top to show success message
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Refresh the page after a delay to show updated data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving metrics:', error);
+                alert('Error saving metrics. Please try again.');
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+        
+        // Auto-calculate and display profit/margin as user types
+        function updateCalculations() {
+            const sales = parseFloat(document.getElementById('sales').value) || 0;
+            const expenses = parseFloat(document.getElementById('expenses').value) || 0;
+            const wastage = parseFloat(document.getElementById('wastage').value) || 0;
+            
+            const profit = sales - expenses;
+            const margin = sales > 0 ? (profit / sales) * 100 : 0;
+            const wastagePercent = sales > 0 ? (wastage / sales) * 100 : 0;
+            
+            // You could add a preview section here if desired
+            console.log(`Profit: ₹${profit.toFixed(2)}, Margin: ${margin.toFixed(1)}%, Wastage: ${wastagePercent.toFixed(1)}%`);
+        }
+        
+        // Add event listeners for real-time calculation
+        document.getElementById('sales').addEventListener('input', updateCalculations);
+        document.getElementById('expenses').addEventListener('input', updateCalculations);
+        document.getElementById('wastage').addEventListener('input', updateCalculations);
+    </script>
+</body>
+</html>

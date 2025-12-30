@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo AI CFO - ArthSethu</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-midnight: #0f172a;
+            --neon-blue: #3b82f6;
+            --gold-amber: #fbbf24;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--deep-midnight) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .chat-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--gold-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .business-context {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-left: 4px solid var(--gold-amber);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .context-title {
+            color: var(--gold-amber);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .context-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .context-item {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .context-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .context-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            max-width: 85%;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.ai {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-left: 4px solid var(--gold-amber);
+        }
+
+        .message.user {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--neon-blue);
+        }
+
+        .message.ai .message-header {
+            color: var(--gold-amber);
+        }
+
+        .message-content {
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+
+        .chat-input-container {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 50px;
+            max-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .typing-dots {
+            display: inline-block;
+            animation: typing 1.5s infinite;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0; }
+            30% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-title {
+                font-size: 2rem;
+            }
+            
+            .context-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1 class="chat-title">🤖 AI CFO Assistant</h1>
+            <div class="demo-badge">🎯 Demo Mode - Intelligent Responses</div>
+            <p>Your AI-powered financial advisor with real business insights</p>
+        </div>
+
+        <div class="business-context">
+            <div class="context-title">📊 Your Business Context</div>
+            <div class="context-grid">
+                <div class="context-item">
+                    <div class="context-label">Business Type</div>
+                    <div class="context-value" th:text="${businessProfile.businessType}">Cafe</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Location</div>
+                    <div class="context-value" th:text="${businessProfile.city}">Mumbai</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Seating</div>
+                    <div class="context-value"><span th:text="${businessProfile.seatingCapacity}">25</span> seats</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Health Score</div>
+                    <div class="context-value">87/100</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Avg Daily Sales</div>
+                    <div class="context-value">₹6,200</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Profit Margin</div>
+                    <div class="context-value">34%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                <div class="message-header">🤖 AI CFO</div>
+                <div class="message-content">
+                    Hello! I'm your AI CFO assistant. I have analyzed your Mumbai cafe's performance and I'm impressed with your 87/100 health score! 
+                    Your 34% profit margin is excellent for the food service industry.
+                    <br><br>
+                    I can help you with:
+                    • Financial analysis and optimization
+                    • Cost reduction strategies  
+                    • Revenue growth opportunities
+                    • What-if scenario planning
+                    • Market insights and benchmarking
+                    <br><br>
+                    What would you like to discuss today?
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            🤖 AI CFO is analyzing your data<span class="typing-dots">...</span>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="quick-actions">
+                <div class="quick-action" onclick="askQuestion('How can I improve my profit margins?')">
+                    📈 Improve Margins
+                </div>
+                <div class="quick-action" onclick="askQuestion('What are my biggest cost drivers?')">
+                    💰 Cost Analysis
+                </div>
+                <div class="quick-action" onclick="askQuestion('Should I expand my seating capacity?')">
+                    🪑 Expansion Analysis
+                </div>
+                <div class="quick-action" onclick="askQuestion('How do I compare to other cafes?')">
+                    📊 Benchmarking
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <textarea 
+                    id="chatInput" 
+                    class="chat-input" 
+                    placeholder="Ask me anything about your business finances..."
+                    rows="2"></textarea>
+                <button id="sendBtn" class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isProcessing = false;
+
+        // Predefined AI responses for demo
+        const aiResponses = {
+            'profit': `Based on your current 34% profit margin, here are my top recommendations:
+
+📈 **Immediate Opportunities (Next 30 days):**
+• Reduce food wastage by 15% → Save ₹4,800/month
+• Optimize menu pricing for high-margin items → +8% revenue
+• Implement dynamic pricing during peak hours → +₹12,000/month
+
+💡 **Strategic Improvements (Next 90 days):**
+• Introduce loyalty program → 20% customer retention boost
+• Add premium coffee variants → 45% higher margins
+• Optimize staff scheduling → Save ₹8,000/month in labor costs
+
+🎯 **Projected Impact:** These changes could increase your profit margin from 34% to 42% within 3 months, adding ₹25,000+ to monthly profits.`,
+
+            'cost': `Here's your detailed cost breakdown and optimization strategy:
+
+💰 **Current Cost Structure:**
+• Ingredients: 45% (₹2,790/day) - *Optimization potential: High*
+• Staff: 25% (₹1,550/day) - *Optimization potential: Medium*  
+• Rent: 15% (₹930/day) - *Fixed cost*
+• Utilities: 8% (₹496/day) - *Optimization potential: Low*
+• Other: 7% (₹434/day) - *Optimization potential: Medium*
+
+🔍 **Biggest Cost Drivers & Solutions:**
+1. **Ingredient Costs (₹2,790/day)** - Your largest expense
+   → Switch to bulk purchasing: Save 12%
+   → Negotiate with 2-3 suppliers: Save 8%
+   → Reduce wastage through better inventory: Save 15%
+
+2. **Staff Costs (₹1,550/day)**
+   → Optimize scheduling during slow hours: Save 10%
+   → Cross-train staff for efficiency: Save 5%
+
+**Total Potential Savings: ₹18,600/month**`,
+
+            'expansion': `Let me analyze your seating expansion opportunity:
+
+🪑 **Current Situation Analysis:**
+• 25 seats generating ₹6,200/day
+• Revenue per seat: ₹248/day
+• Utilization rate: ~85% during peak hours
+
+📊 **Expansion Scenarios:**
+
+**Option 1: Add 10 seats (40% increase)**
+• Investment needed: ₹2,50,000
+• Additional daily revenue: ₹2,480
+• Break-even period: 4.2 months
+• ROI: 285% annually
+
+**Option 2: Add 5 seats (20% increase)**  
+• Investment needed: ₹1,25,000
+• Additional daily revenue: ₹1,240
+• Break-even period: 3.4 months
+• ROI: 295% annually
+
+🎯 **My Recommendation:** Start with 5 seats. Lower risk, faster payback, and you can assess demand before further expansion.
+
+**Key Success Factors:**
+• Maintain service quality during busy periods
+• Ensure adequate staff for larger capacity
+• Monitor customer satisfaction scores`,
+
+            'benchmark': `Here's how your Mumbai cafe compares to industry benchmarks:
+
+📊 **Performance Comparison:**
+
+**Your Cafe vs Industry Average:**
+• Profit Margin: 34% vs 18% ✅ **+89% above average**
+• Daily Revenue/Seat: ₹248 vs ₹180 ✅ **+38% above average**  
+• Health Score: 87/100 vs 72/100 ✅ **Top 15% performer**
+• Customer Retention: 68% vs 45% ✅ **+51% above average**
+
+**Your Cafe vs Top Performers:**
+• Profit Margin: 34% vs 42% ⚠️ **8% gap to close**
+• Wastage Rate: 5.2% vs 3.1% ⚠️ **Room for improvement**
+• Staff Productivity: Good vs Excellent ⚠️ **Optimization opportunity**
+
+🏆 **Your Ranking:** Top 25% in Mumbai cafe market
+
+**Key Strengths:**
+• Excellent location utilization
+• Strong customer loyalty  
+• Efficient operations
+• Premium pricing acceptance
+
+**Growth Opportunities:**
+• Reduce wastage to match top performers → +₹6,000/month
+• Improve staff efficiency → +₹4,000/month
+• Optimize peak hour capacity → +₹8,000/month`
+        };
+
+        function askQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            if (isProcessing) return;
+
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage('user', 'You', message);
+            
+            // Clear input
+            input.value = '';
+            
+            // Show typing indicator
+            showTyping(true);
+            isProcessing = true;
+
+            // Simulate AI processing delay
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addMessage('ai', '🤖 AI CFO', response);
+                showTyping(false);
+                isProcessing = false;
+            }, 2000 + Math.random() * 2000); // 2-4 seconds delay
+        }
+
+        function generateAIResponse(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            if (lowerQuery.includes('profit') || lowerQuery.includes('margin')) {
+                return aiResponses.profit;
+            } else if (lowerQuery.includes('cost') || lowerQuery.includes('expense')) {
+                return aiResponses.cost;
+            } else if (lowerQuery.includes('expand') || lowerQuery.includes('seat') || lowerQuery.includes('capacity')) {
+                return aiResponses.expansion;
+            } else if (lowerQuery.includes('compare') || lowerQuery.includes('benchmark') || lowerQuery.includes('other')) {
+                return aiResponses.benchmark;
+            } else {
+                // Generic intelligent response
+                return `Great question! Based on your cafe's strong performance (87/100 health score, 34% profit margin), here's my analysis:
+
+🎯 **Key Insights:**
+• Your Mumbai location is performing exceptionally well
+• Revenue of ₹6,200/day with 25 seats shows excellent efficiency
+• Your profit margin of 34% is 89% above industry average
+
+💡 **Specific Recommendations:**
+• Focus on reducing the 5.2% wastage rate to boost profits
+• Consider premium menu additions during peak hours
+• Implement customer loyalty programs for retention
+
+📈 **Next Steps:**
+• Monitor daily metrics consistently
+• Track customer feedback for service improvements  
+• Plan strategic expansion when ready
+
+Would you like me to dive deeper into any specific area of your business?`;
+            }
+        }
+
+        function addMessage(type, sender, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Format content with basic markdown-like formatting
+            const formattedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">${sender}</div>
+                <div class="message-content">${formattedContent}</div>
+                <div class="message-time">${timeStr}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping(show) {
+            const indicator = document.getElementById('typingIndicator');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (show) {
+                indicator.classList.add('show');
+                sendBtn.disabled = true;
+            } else {
+                indicator.classList.remove('show');
+                sendBtn.disabled = false;
+            }
+        }
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            
+            // Handle Enter key
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            console.log('Demo AI CFO loaded with intelligent responses');
+        });
+    </script>
+</body>
+</html>

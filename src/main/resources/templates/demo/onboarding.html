@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Onboarding - ArthSethu</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-midnight: #0f172a;
+            --neon-blue: #3b82f6;
+            --gold-amber: #fbbf24;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--deep-midnight) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .onboarding-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .onboarding-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .onboarding-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--gold-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            background: var(--glass-white);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--neon-blue), var(--gold-amber));
+            height: 100%;
+            width: 20%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .question-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .question-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .radio-input:checked + .radio-label {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .radio-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-white);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .success-container {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .success-container.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .onboarding-title {
+                font-size: 2rem;
+            }
+            
+            .question-card {
+                padding: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <h1 class="onboarding-title">Smart Business Onboarding</h1>
+            <div class="demo-badge">🎯 Demo Mode - Fully Functional</div>
+            <p>Experience our dynamic questionnaire with realistic business scenarios</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Step 1 of 5</div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+            <div class="question-title" id="questionTitle">What type of business are you planning to start?</div>
+            <div class="question-description" id="questionDescription">
+                Select the business type that best matches your entrepreneurial vision. 
+                This will customize the rest of your onboarding experience.
+            </div>
+
+            <div class="form-group">
+                <div class="radio-group" id="optionsContainer">
+                    <div class="radio-option">
+                        <input type="radio" id="cafe" name="businessType" value="CAFE" class="radio-input">
+                        <label for="cafe" class="radio-label">
+                            <strong>☕ Cafe</strong>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                Coffee shop with seating
+                            </div>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="cloud_kitchen" name="businessType" value="CLOUD_KITCHEN" class="radio-input">
+                        <label for="cloud_kitchen" class="radio-label">
+                            <strong>🍳 Cloud Kitchen</strong>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                Delivery-only restaurant
+                            </div>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="retail" name="businessType" value="RETAIL" class="radio-input">
+                        <label for="retail" class="radio-label">
+                            <strong>🏪 Retail Store</strong>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                Physical retail business
+                            </div>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="service" name="businessType" value="SERVICE" class="radio-input">
+                        <label for="service" class="radio-label">
+                            <strong>💼 Service Business</strong>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                Consulting or services
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">
+                    ← Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                    Next →
+                </button>
+            </div>
+        </div>
+
+        <div class="success-container" id="successContainer">
+            <div class="success-icon">✓</div>
+            <h2>Profile Created Successfully!</h2>
+            <p>Your business profile has been created with mock data. In a real scenario, this would be saved to your account.</p>
+            <div style="margin-top: 2rem;">
+                <a href="/demo/dashboard" class="btn btn-primary">Go to Dashboard</a>
+                <a href="/demo" class="btn btn-secondary" style="margin-left: 1rem;">Back to Demo Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let totalSteps = 5;
+        let responses = {};
+
+        const questions = [
+            {
+                id: 'business_type',
+                title: 'What type of business are you planning to start?',
+                description: 'Select the business type that best matches your entrepreneurial vision.',
+                type: 'radio',
+                options: [
+                    { value: 'CAFE', label: '☕ Cafe', description: 'Coffee shop with seating' },
+                    { value: 'CLOUD_KITCHEN', label: '🍳 Cloud Kitchen', description: 'Delivery-only restaurant' },
+                    { value: 'RETAIL', label: '🏪 Retail Store', description: 'Physical retail business' },
+                    { value: 'SERVICE', label: '💼 Service Business', description: 'Consulting or services' }
+                ]
+            },
+            {
+                id: 'city',
+                title: 'In which city are you planning to start?',
+                description: 'Location is crucial for market analysis and cost calculations.',
+                type: 'input',
+                placeholder: 'Enter city name (e.g., Mumbai, Delhi, Bangalore)'
+            },
+            {
+                id: 'investment',
+                title: 'What is your planned initial investment?',
+                description: 'This helps us calculate your break-even point and ROI projections.',
+                type: 'input',
+                placeholder: 'Enter amount in ₹ (e.g., 500000)'
+            },
+            {
+                id: 'experience',
+                title: 'What is your experience level in this business?',
+                description: 'This helps us provide more targeted recommendations.',
+                type: 'radio',
+                options: [
+                    { value: 'BEGINNER', label: '🌱 Beginner', description: 'First time entrepreneur' },
+                    { value: 'INTERMEDIATE', label: '📈 Intermediate', description: '1-3 years experience' },
+                    { value: 'EXPERT', label: '🎯 Expert', description: '3+ years experience' }
+                ]
+            },
+            {
+                id: 'timeline',
+                title: 'When do you plan to launch?',
+                description: 'Timeline affects planning and market entry strategy.',
+                type: 'radio',
+                options: [
+                    { value: '1_MONTH', label: '🚀 Within 1 month', description: 'Ready to launch soon' },
+                    { value: '3_MONTHS', label: '📅 Within 3 months', description: 'Planning phase' },
+                    { value: '6_MONTHS', label: '🎯 Within 6 months', description: 'Long-term planning' }
+                ]
+            }
+        ];
+
+        function nextStep() {
+            const currentAnswer = getCurrentAnswer();
+            if (!currentAnswer) {
+                alert('Please provide an answer before continuing.');
+                return;
+            }
+
+            // Store response
+            responses[questions[currentStep - 1].id] = currentAnswer;
+
+            if (currentStep < totalSteps) {
+                currentStep++;
+                displayQuestion(questions[currentStep - 1]);
+                updateProgress();
+                updateButtons();
+            } else {
+                // Complete onboarding
+                completeOnboarding();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                displayQuestion(questions[currentStep - 1]);
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        function getCurrentAnswer() {
+            const question = questions[currentStep - 1];
+            
+            if (question.type === 'radio') {
+                const selected = document.querySelector('input[name="' + question.id + '"]:checked');
+                return selected ? selected.value : null;
+            } else {
+                const input = document.getElementById('answerInput');
+                return input ? input.value.trim() : null;
+            }
+        }
+
+        function displayQuestion(question) {
+            document.getElementById('questionTitle').textContent = question.title;
+            document.getElementById('questionDescription').textContent = question.description;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            if (question.type === 'radio') {
+                container.className = 'radio-group';
+                question.options.forEach(option => {
+                    const optionHtml = `
+                        <div class="radio-option">
+                            <input type="radio" id="${option.value}" name="${question.id}" value="${option.value}" class="radio-input">
+                            <label for="${option.value}" class="radio-label">
+                                <strong>${option.label}</strong>
+                                <div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                    ${option.description}
+                                </div>
+                            </label>
+                        </div>
+                    `;
+                    container.innerHTML += optionHtml;
+                });
+            } else {
+                container.className = 'form-group';
+                container.innerHTML = `
+                    <input type="text" id="answerInput" class="form-input" placeholder="${question.placeholder}">
+                `;
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            nextBtn.textContent = currentStep === totalSteps ? 'Complete Onboarding' : 'Next →';
+        }
+
+        function completeOnboarding() {
+            // Simulate API call
+            setTimeout(() => {
+                document.getElementById('questionCard').style.display = 'none';
+                document.querySelector('.progress-container').style.display = 'none';
+                document.getElementById('successContainer').classList.add('show');
+            }, 1000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Demo Onboarding loaded');
+            updateProgress();
+            updateButtons();
+        });
+    </script>
+</body>
+</html>

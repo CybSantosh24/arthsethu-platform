@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI CFO - ArthSethu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .chat-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-header h1 {
+            color: #3b82f6;
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .chat-header p {
+            color: #94a3b8;
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+        }
+        
+        .business-context {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .business-context h3 {
+            color: #fbbf24;
+            margin-top: 0;
+            font-weight: 600;
+        }
+        
+        .context-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .context-item {
+            background: rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .context-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .context-item strong {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 80%;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .message:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .message.user {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.ai {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+        }
+        
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3b82f6;
+        }
+        
+        .message-content {
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .chat-input-container {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            position: sticky;
+            bottom: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            color: #e2e8f0;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 50px;
+            max-height: 150px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+        
+        .chat-input::placeholder {
+            color: #64748b;
+        }
+        
+        .send-btn, .simulate-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .send-btn:hover, .simulate-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .send-btn:disabled, .simulate-btn:disabled {
+            background: #374151;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action {
+            background: rgba(59, 130, 246, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 10px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .quick-action:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #3b82f6;
+            padding: 20px;
+            font-weight: 500;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 10px;
+            }
+            
+            .context-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .quick-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 AI CFO</h1>
+            <p>Your intelligent financial advisor powered by AI</p>
+        </div>
+        
+        <div class="business-context" th:if="${profile}">
+            <h3>📊 Your Business Context</h3>
+            <div class="context-grid">
+                <div class="context-item">
+                    <strong>Business Type:</strong> <span th:text="${profile.businessType}"></span>
+                </div>
+                <div class="context-item">
+                    <strong>Location:</strong> <span th:text="${profile.city}"></span>
+                </div>
+                <div class="context-item" th:if="${profile.seatingCapacity}">
+                    <strong>Seating:</strong> <span th:text="${profile.seatingCapacity}"></span> seats
+                </div>
+                <div class="context-item" th:if="${!recentMetrics.empty}">
+                    <strong>Recent Health Score:</strong> 
+                    <span th:text="${recentMetrics[0].healthScore}"></span>/100
+                </div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                <div class="message-header">AI CFO</div>
+                <div class="message-content">
+                    Hello! I'm your AI CFO, ready to help you with strategic financial guidance. 
+                    I have access to your business data and can provide personalized insights, 
+                    perform what-if analyses, and help you make informed decisions.
+                    <br><br>
+                    What would you like to discuss today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div>🤔 AI CFO is thinking...</div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="quick-actions">
+                <button class="quick-action" onclick="askQuickQuestion('How is my business performing?')">
+                    📈 Performance Review
+                </button>
+                <button class="quick-action" onclick="askQuickQuestion('What are my biggest cost drivers?')">
+                    💰 Cost Analysis
+                </button>
+                <button class="quick-action" onclick="askQuickQuestion('How can I improve my profit margins?')">
+                    📊 Margin Optimization
+                </button>
+                <button class="quick-action" onclick="showSimulationPrompt()">
+                    🔮 What-If Simulation
+                </button>
+            </div>
+            
+            <div class="input-group">
+                <textarea 
+                    id="chatInput" 
+                    class="chat-input" 
+                    placeholder="Ask me anything about your business finances..."
+                    rows="2"></textarea>
+                <button id="sendBtn" class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isProcessing = false;
+        let stompClient = null;
+        let connected = false;
+        
+        // Initialize chat and WebSocket connection
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            
+            // Handle Enter key (Shift+Enter for new line)
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            });
+            
+            // Initialize WebSocket connection
+            connectWebSocket();
+        });
+        
+        function connectWebSocket() {
+            const socket = new SockJS('/ai-cfo-websocket');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                connected = true;
+                
+                // Subscribe to AI CFO responses
+                stompClient.subscribe('/user/topic/ai-cfo', function(message) {
+                    const response = JSON.parse(message.body);
+                    handleWebSocketResponse(response);
+                });
+                
+            }, function(error) {
+                console.log('WebSocket connection error: ' + error);
+                connected = false;
+                // Fallback to HTTP requests if WebSocket fails
+            });
+        }
+        
+        function handleWebSocketResponse(response) {
+            showLoading(false);
+            isProcessing = false;
+            
+            if (response.success) {
+                addMessage('ai', 'AI CFO', response.content);
+            } else {
+                showError(response.content || 'Failed to get response from AI CFO');
+            }
+        }
+        
+        function askQuickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+        
+        function showSimulationPrompt() {
+            const scenario = prompt("Describe a scenario you'd like to simulate:\n\nExample: 'What if I increase my prices by 10%?' or 'What if I reduce wastage by half?'");
+            if (scenario && scenario.trim()) {
+                performSimulation(scenario.trim());
+            }
+        }
+        
+        function sendMessage() {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage('user', 'You', message);
+            
+            // Clear input
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Show loading
+            showLoading(true);
+            isProcessing = true;
+            
+            // Try WebSocket first, fallback to HTTP
+            if (connected && stompClient) {
+                try {
+                    stompClient.send("/app/ai-cfo/chat", {}, JSON.stringify({
+                        query: message
+                    }));
+                    return;
+                } catch (error) {
+                    console.log('WebSocket send failed, falling back to HTTP');
+                }
+            }
+            
+            // Fallback to HTTP request
+            sendMessageHTTP(message);
+        }
+        
+        function sendMessageHTTP(message) {
+            fetch('/ai-cfo/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showLoading(false);
+                isProcessing = false;
+                
+                if (data.success) {
+                    addMessage('ai', 'AI CFO', data.response);
+                } else {
+                    showError(data.error || 'Failed to get response from AI CFO');
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                isProcessing = false;
+                showError('Network error. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+        
+        function performSimulation(scenario) {
+            if (isProcessing) return;
+            
+            // Add user message to chat
+            addMessage('user', 'You', `🔮 Simulation: ${scenario}`);
+            
+            // Show loading
+            showLoading(true);
+            isProcessing = true;
+            
+            // Send simulation request (HTTP only for now)
+            fetch('/ai-cfo/simulate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    scenario: scenario
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showLoading(false);
+                isProcessing = false;
+                
+                if (data.success) {
+                    const analysis = data.analysis;
+                    let response = `📊 **What-If Analysis: ${analysis.scenario}**\n\n`;
+                    response += analysis.analysis;
+                    
+                    if (analysis.impactScore) {
+                        response += `\n\n**Impact Score: ${analysis.impactScore}/100**`;
+                    }
+                    
+                    addMessage('ai', 'AI CFO', response);
+                } else {
+                    showError(data.error || 'Failed to perform simulation');
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                isProcessing = false;
+                showError('Network error. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+        
+        function addMessage(type, sender, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            // Format content (basic markdown-like formatting)
+            const formattedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">${sender}</div>
+                <div class="message-content">${formattedContent}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function showLoading(show) {
+            const loading = document.getElementById('loadingIndicator');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (show) {
+                loading.classList.add('show');
+                sendBtn.disabled = true;
+            } else {
+                loading.classList.remove('show');
+                sendBtn.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Hide error after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Clean up WebSocket connection when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (stompClient && connected) {
+                stompClient.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>

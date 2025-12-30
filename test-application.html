@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArthSethu Application Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>ArthSethu Application Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>1. Application Status</h2>
+        <button onclick="testApplicationStatus()">Test Application Status</button>
+        <div id="status-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Onboarding API Test</h2>
+        <button onclick="testOnboardingStart()">Test Onboarding Start</button>
+        <button onclick="testOnboardingFlow()">Test Full Onboarding Flow</button>
+        <div id="onboarding-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Authentication Test</h2>
+        <button onclick="testLogin()">Test Login Page</button>
+        <button onclick="testDashboard()">Test Dashboard Access</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. AI CFO Test</h2>
+        <button onclick="testAICFO()">Test AI CFO Access</button>
+        <div id="aicfo-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Reports Test</h2>
+        <button onclick="testReports()">Test Reports Access</button>
+        <div id="reports-result"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8080/arthsethu';
+        
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="test-result ${type}">${message}</div>`;
+        }
+        
+        function showError(elementId, error) {
+            showResult(elementId, `Error: ${error.message || error}`, 'error');
+        }
+        
+        function showSuccess(elementId, message) {
+            showResult(elementId, message, 'success');
+        }
+        
+        async function testApplicationStatus() {
+            try {
+                const response = await fetch(`${BASE_URL}/`);
+                if (response.ok) {
+                    showSuccess('status-result', `✅ Application is running! Status: ${response.status}`);
+                } else {
+                    showError('status-result', `Application returned status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('status-result', `Cannot connect to application: ${error.message}`);
+            }
+        }
+        
+        async function testOnboardingStart() {
+            try {
+                const response = await fetch(`${BASE_URL}/onboarding/start`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showSuccess('onboarding-result', 
+                        `✅ Onboarding API working!<br>
+                        <strong>Question:</strong> ${data.questionText}<br>
+                        <strong>Type:</strong> ${data.questionType}<br>
+                        <strong>Options:</strong> ${data.options ? data.options.join(', ') : 'N/A'}<br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>`
+                    );
+                } else {
+                    showError('onboarding-result', `Onboarding API returned status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('onboarding-result', error);
+            }
+        }
+        
+        async function testOnboardingFlow() {
+            try {
+                // Step 1: Get first question
+                let response = await fetch(`${BASE_URL}/onboarding/start`);
+                let data = await response.json();
+                
+                if (data.questionId !== 'business_type') {
+                    throw new Error('Expected business_type question first');
+                }
+                
+                // Step 2: Answer business type
+                response = await fetch(`${BASE_URL}/onboarding/next-question`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questionId: 'business_type',
+                        answer: 'CAFE',
+                        businessType: 'CAFE',
+                        previousResponses: { business_type: 'CAFE' }
+                    })
+                });
+                
+                data = await response.json();
+                
+                showSuccess('onboarding-result', 
+                    `✅ Onboarding flow working!<br>
+                    <strong>Next Question:</strong> ${data.questionText}<br>
+                    <strong>Question ID:</strong> ${data.questionId}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>`
+                );
+            } catch (error) {
+                showError('onboarding-result', error);
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${BASE_URL}/login`);
+                if (response.ok) {
+                    showSuccess('auth-result', `✅ Login page accessible! Status: ${response.status}`);
+                } else {
+                    showError('auth-result', `Login page returned status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('auth-result', error);
+            }
+        }
+        
+        async function testDashboard() {
+            try {
+                const response = await fetch(`${BASE_URL}/dashboard`);
+                if (response.status === 302 || response.status === 200) {
+                    showSuccess('auth-result', `✅ Dashboard endpoint working! Status: ${response.status} (redirects to login if not authenticated)`);
+                } else {
+                    showError('auth-result', `Dashboard returned unexpected status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('auth-result', error);
+            }
+        }
+        
+        async function testAICFO() {
+            try {
+                const response = await fetch(`${BASE_URL}/ai-cfo`);
+                if (response.status === 302 || response.status === 200) {
+                    showSuccess('aicfo-result', `✅ AI CFO endpoint working! Status: ${response.status} (redirects to login if not authenticated)`);
+                } else {
+                    showError('aicfo-result', `AI CFO returned unexpected status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('aicfo-result', error);
+            }
+        }
+        
+        async function testReports() {
+            try {
+                const response = await fetch(`${BASE_URL}/reports`);
+                if (response.status === 302 || response.status === 200) {
+                    showSuccess('reports-result', `✅ Reports endpoint working! Status: ${response.status} (redirects to login if not authenticated)`);
+                } else {
+                    showError('reports-result', `Reports returned unexpected status: ${response.status}`);
+                }
+            } catch (error) {
+                showError('reports-result', error);
+            }
+        }
+        
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            testApplicationStatus();
+            setTimeout(testOnboardingStart, 1000);
+        };
+    </script>
+</body>
+</html>

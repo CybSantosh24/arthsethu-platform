@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Reports - ArthSethu</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-midnight: #0f172a;
+            --neon-blue: #3b82f6;
+            --gold-amber: #fbbf24;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--deep-midnight) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .reports-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .reports-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .reports-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--gold-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .generate-section {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .report-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+            border-color: var(--neon-blue);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .report-id {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+
+        .report-status {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .report-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .report-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .report-detail strong {
+            color: var(--text-primary);
+        }
+
+        .report-metrics {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold-amber);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--gold-amber);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .demo-info {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-info h4 {
+            color: var(--gold-amber);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .reports-title {
+                font-size: 2rem;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reports-container">
+        <div class="reports-header">
+            <h1 class="reports-title">📄 Feasibility Reports</h1>
+            <div class="demo-badge">🎯 Demo Mode - Instant Report Generation</div>
+        </div>
+
+        <div class="demo-info">
+            <h4>📊 Professional Business Analysis</h4>
+            <p>Generate comprehensive feasibility reports with financial projections, market analysis, and strategic recommendations.</p>
+        </div>
+
+        <div class="generate-section">
+            <h3 style="color: var(--neon-blue); margin-bottom: 1rem;">Generate New Report</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                Create a detailed feasibility analysis for your business with AI-powered insights and financial projections.
+            </p>
+            <button class="generate-btn" onclick="generateNewReport()">
+                🚀 Generate Feasibility Report
+            </button>
+        </div>
+
+        <div class="reports-grid">
+            <div class="report-card" th:each="report : ${reports}">
+                <div class="report-header">
+                    <div class="report-id" th:text="${report.id}">RPT_001</div>
+                    <div class="report-status" th:text="${report.status}">COMPLETED</div>
+                </div>
+                
+                <div class="report-details">
+                    <div class="report-detail">
+                        <span>Business Type:</span>
+                        <strong th:text="${report.businessType}">Cafe</strong>
+                    </div>
+                    <div class="report-detail">
+                        <span>Location:</span>
+                        <strong th:text="${report.city}">Mumbai</strong>
+                    </div>
+                    <div class="report-detail">
+                        <span>Generated:</span>
+                        <strong th:text="${#temporals.format(report.generatedAt, 'MMM dd, yyyy')}">Dec 30, 2024</strong>
+                    </div>
+                </div>
+
+                <div class="report-metrics">
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">₹2.5L</div>
+                            <div class="metric-label">Initial Investment</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">8 months</div>
+                            <div class="metric-label">Break-even</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">285%</div>
+                            <div class="metric-label">Annual ROI</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">High</div>
+                            <div class="metric-label">Feasibility</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-actions">
+                    <a th:href="@{'/demo/reports/' + ${report.id}}" class="action-btn btn-primary">
+                        👁️ View Report
+                    </a>
+                    <a th:href="@{'/demo/reports/' + ${report.id} + '/download'}" class="action-btn btn-secondary">
+                        📥 Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 style="color: var(--neon-blue); margin-bottom: 1rem;">Generating Report</h3>
+            <p style="color: var(--text-secondary);">
+                Analyzing market data, calculating financial projections, and preparing your comprehensive feasibility report...
+            </p>
+            <div style="margin-top: 2rem;">
+                <div style="background: var(--glass-white); border-radius: 8px; padding: 0.5rem; margin-bottom: 0.5rem;">
+                    <div id="progressBar" style="background: linear-gradient(90deg, var(--neon-blue), var(--gold-amber)); height: 8px; border-radius: 4px; width: 0%; transition: width 0.5s ease;"></div>
+                </div>
+                <div id="progressText" style="color: var(--text-muted); font-size: 0.9rem;">Initializing analysis...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateNewReport() {
+            const overlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            overlay.style.display = 'flex';
+            
+            const steps = [
+                { progress: 20, text: 'Analyzing market conditions...' },
+                { progress: 40, text: 'Calculating financial projections...' },
+                { progress: 60, text: 'Evaluating risk factors...' },
+                { progress: 80, text: 'Generating recommendations...' },
+                { progress: 100, text: 'Finalizing report...' }
+            ];
+            
+            let currentStep = 0;
+            
+            const updateProgress = () => {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressBar.style.width = step.progress + '%';
+                    progressText.textContent = step.text;
+                    currentStep++;
+                    
+                    setTimeout(updateProgress, 1500);
+                } else {
+                    // Report generation complete
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showSuccessMessage();
+                        addNewReportToGrid();
+                    }, 1000);
+                }
+            };
+            
+            updateProgress();
+        }
+
+        function showSuccessMessage() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 1.5rem 2rem;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 1001;
+                box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span>Report generated successfully!</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        function addNewReportToGrid() {
+            const grid = document.querySelector('.reports-grid');
+            const newReportId = 'RPT_' + (Date.now().toString().slice(-3));
+            
+            const newReportCard = document.createElement('div');
+            newReportCard.className = 'report-card';
+            newReportCard.style.animation = 'fadeIn 0.5s ease';
+            
+            newReportCard.innerHTML = `
+                <div class="report-header">
+                    <div class="report-id">${newReportId}</div>
+                    <div class="report-status">COMPLETED</div>
+                </div>
+                
+                <div class="report-details">
+                    <div class="report-detail">
+                        <span>Business Type:</span>
+                        <strong>Cafe</strong>
+                    </div>
+                    <div class="report-detail">
+                        <span>Location:</span>
+                        <strong>Mumbai</strong>
+                    </div>
+                    <div class="report-detail">
+                        <span>Generated:</span>
+                        <strong>Just now</strong>
+                    </div>
+                </div>
+
+                <div class="report-metrics">
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">₹2.8L</div>
+                            <div class="metric-label">Initial Investment</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">7 months</div>
+                            <div class="metric-label">Break-even</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">320%</div>
+                            <div class="metric-label">Annual ROI</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">High</div>
+                            <div class="metric-label">Feasibility</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-actions">
+                    <a href="/demo/reports/${newReportId}" class="action-btn btn-primary">
+                        👁️ View Report
+                    </a>
+                    <a href="/demo/reports/${newReportId}/download" class="action-btn btn-secondary">
+                        📥 Download PDF
+                    </a>
+                </div>
+            `;
+            
+            grid.insertBefore(newReportCard, grid.firstChild);
+        }
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Demo Reports loaded with generation simulation');
+            
+            // Add hover effects to report cards
+            const cards = document.querySelectorAll('.report-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

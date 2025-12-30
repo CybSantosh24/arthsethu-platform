@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArthSethu - Working Demo</title>
+    <style>
+        /* Dark Mode FinTech Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-midnight: #0f172a;
+            --neon-blue: #3b82f6;
+            --gold-amber: #fbbf24;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--deep-midnight) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--gold-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            border-color: var(--neon-blue);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--neon-blue);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Onboarding Styles */
+        .onboarding-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--neon-blue), var(--gold-amber));
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .radio-input:checked + .radio-label {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--neon-blue);
+        }
+
+        /* AI CFO Chat Styles */
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .message.ai {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 4px solid var(--gold-amber);
+        }
+
+        .message.user {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--neon-blue);
+            margin-left: auto;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+        }
+
+        /* Dashboard Styles */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🚀 ArthSethu Platform</h1>
+            <p class="subtitle">AI-Powered Business Intelligence & Financial Advisory</p>
+            <div class="demo-badge">✨ Interactive Demo - All Features Working</div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('home')">🏠 Home</button>
+            <button class="nav-tab" onclick="showTab('onboarding')">📝 Onboarding</button>
+            <button class="nav-tab" onclick="showTab('ai-cfo')">🤖 AI CFO</button>
+            <button class="nav-tab" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="showTab('reports')">📋 Reports</button>
+        </div>
+
+        <!-- Home Tab -->
+        <div id="home" class="tab-content active">
+            <h2 style="margin-bottom: 2rem; color: var(--neon-blue);">Welcome to ArthSethu Demo</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3 class="feature-title">Smart Onboarding</h3>
+                    <p class="feature-description">Dynamic questionnaire that adapts to your business type</p>
+                    <button class="btn btn-primary" onclick="showTab('onboarding')">Try Now</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI CFO Assistant</h3>
+                    <p class="feature-description">AI-powered financial advisor with intelligent responses</p>
+                    <button class="btn btn-primary" onclick="showTab('ai-cfo')">Chat Now</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Business Dashboard</h3>
+                    <p class="feature-description">Real-time metrics and health score tracking</p>
+                    <button class="btn btn-primary" onclick="showTab('dashboard')">View Dashboard</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Feasibility Reports</h3>
+                    <p class="feature-description">Professional PDF reports with financial analysis</p>
+                    <button class="btn btn-primary" onclick="showTab('reports')">Generate Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Tab -->
+        <div id="onboarding" class="tab-content">
+            <h2 style="margin-bottom: 2rem; color: var(--neon-blue);">Smart Business Onboarding</h2>
+            <div class="onboarding-form">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 20%;"></div>
+                </div>
+                <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);" id="progressText">Step 1 of 5</p>
+
+                <div class="form-step active" id="step1">
+                    <h3 style="margin-bottom: 1rem;">What type of business are you planning?</h3>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="cafe" name="businessType" value="CAFE" class="radio-input">
+                            <label for="cafe" class="radio-label">
+                                <strong>☕ Cafe</strong><br>
+                                <small>Coffee shop with seating</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="cloud_kitchen" name="businessType" value="CLOUD_KITCHEN" class="radio-input">
+                            <label for="cloud_kitchen" class="radio-label">
+                                <strong>🍳 Cloud Kitchen</strong><br>
+                                <small>Delivery-only restaurant</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="retail" name="businessType" value="RETAIL" class="radio-input">
+                            <label for="retail" class="radio-label">
+                                <strong>🏪 Retail Store</strong><br>
+                                <small>Physical retail business</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step2">
+                    <h3 style="margin-bottom: 1rem;">Where will you start your business?</h3>
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-input" placeholder="e.g., Mumbai, Delhi, Bangalore" id="city">
+                    </div>
+                </div>
+
+                <div class="form-step" id="step3">
+                    <h3 style="margin-bottom: 1rem;">What's your planned investment?</h3>
+                    <div class="form-group">
+                        <label class="form-label">Initial Investment (₹)</label>
+                        <input type="number" class="form-input" placeholder="e.g., 500000" id="investment">
+                    </div>
+                </div>
+
+                <div class="form-step" id="step4">
+                    <h3 style="margin-bottom: 1rem;">What's your experience level?</h3>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="beginner" name="experience" value="BEGINNER" class="radio-input">
+                            <label for="beginner" class="radio-label">
+                                <strong>🌱 Beginner</strong><br>
+                                <small>First time entrepreneur</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="intermediate" name="experience" value="INTERMEDIATE" class="radio-input">
+                            <label for="intermediate" class="radio-label">
+                                <strong>📈 Intermediate</strong><br>
+                                <small>1-3 years experience</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="expert" name="experience" value="EXPERT" class="radio-input">
+                            <label for="expert" class="radio-label">
+                                <strong>🎯 Expert</strong><br>
+                                <small>3+ years experience</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step5">
+                    <h3 style="margin-bottom: 1rem;">When do you plan to launch?</h3>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="month1" name="timeline" value="1_MONTH" class="radio-input">
+                            <label for="month1" class="radio-label">
+                                <strong>🚀 Within 1 month</strong><br>
+                                <small>Ready to launch soon</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="month3" name="timeline" value="3_MONTHS" class="radio-input">
+                            <label for="month3" class="radio-label">
+                                <strong>📅 Within 3 months</strong><br>
+                                <small>Planning phase</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="month6" name="timeline" value="6_MONTHS" class="radio-input">
+                            <label for="month6" class="radio-label">
+                                <strong>🎯 Within 6 months</strong><br>
+                                <small>Long-term planning</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: space-between; margin-top: 2rem;">
+                    <button class="btn" style="background: var(--glass-white); color: var(--text-primary); border: 1px solid var(--glass-border);" onclick="previousStep()" id="prevBtn" disabled>← Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI CFO Tab -->
+        <div id="ai-cfo" class="tab-content">
+            <h2 style="margin-bottom: 2rem; color: var(--neon-blue);">🤖 AI CFO Assistant</h2>
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        <strong>🤖 AI CFO:</strong><br>
+                        Hello! I'm your AI CFO assistant. I can help you with financial analysis, cost optimization, and strategic planning. 
+                        Based on your Mumbai cafe's performance, I see you have an excellent 87/100 health score and 34% profit margin!
+                        <br><br>What would you like to discuss?
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" placeholder="Ask me about your business finances..." id="chatInput">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <h2 style="margin-bottom: 2rem; color: var(--neon-blue);">📊 Business Dashboard</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">87</div>
+                    <div class="metric-label">Health Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">₹6,200</div>
+                    <div class="metric-label">Daily Revenue</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">34%</div>
+                    <div class="metric-label">Profit Margin</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">25</div>
+                    <div class="metric-label">Seating Capacity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">₹45,000</div>
+                    <div class="metric-label">Monthly Rent</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">5.2%</div>
+                    <div class="metric-label">Wastage Rate</div>
+                </div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 2rem; margin-top: 2rem;">
+                <h3 style="color: var(--gold-amber); margin-bottom: 1rem;">📈 Performance Insights</h3>
+                <ul style="color: var(--text-secondary); line-height: 1.8;">
+                    <li>Your profit margin of 34% is 89% above industry average</li>
+                    <li>Daily revenue per seat (₹248) exceeds market benchmark by 38%</li>
+                    <li>Health score of 87/100 puts you in the top 15% of performers</li>
+                    <li>Opportunity to reduce wastage from 5.2% to 3.1% for additional ₹6,000/month</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2 style="margin-bottom: 2rem; color: var(--neon-blue);">📋 Feasibility Reports</h2>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Generate comprehensive business feasibility reports with financial analysis</p>
+                <button class="btn btn-primary" onclick="generateReport()">Generate Sample Report</button>
+            </div>
+            <div id="reportContent" style="display: none; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 2rem; margin-top: 2rem;">
+                <h3 style="color: var(--gold-amber); margin-bottom: 1rem;">📄 Feasibility Report - Mumbai Cafe</h3>
+                <div style="color: var(--text-secondary); line-height: 1.6;">
+                    <p><strong>Executive Summary:</strong></p>
+                    <p>This cafe business shows strong potential with a projected break-even period of 8 months. The Mumbai location provides excellent foot traffic, and the initial investment of ₹2.5L is reasonable for expected returns.</p>
+                    <br>
+                    <p><strong>Financial Projections:</strong></p>
+                    <ul>
+                        <li>Initial Investment: ₹2,50,000</li>
+                        <li>Monthly Operating Expenses: ₹1,80,000</li>
+                        <li>Projected Monthly Revenue: ₹1,86,000</li>
+                        <li>Break-even Point: 8 months</li>
+                        <li>ROI (Year 1): 28%</li>
+                    </ul>
+                    <br>
+                    <p><strong>Market Analysis:</strong></p>
+                    <p>Mumbai's cafe market is growing at 15% annually. Your location in a commercial area with high foot traffic provides competitive advantage.</p>
+                </div>
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn btn-primary">📥 Download PDF Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Hide all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activate the corresponding nav tab
+            const activeNavTab = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+            if (activeNavTab) {
+                activeNavTab.classList.add('active');
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+                updateButtons();
+            } else {
+                // Complete onboarding
+                alert('🎉 Onboarding completed! Your business profile has been created successfully.');
+                showTab('dashboard');
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.textContent = currentStep === totalSteps ? 'Complete' : 'Next →';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            const messagesContainer = document.getElementById('chatMessages');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `<strong>You:</strong><br>${message}`;
+            messagesContainer.appendChild(userMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
+                aiMessage.innerHTML = `<strong>🤖 AI CFO:</strong><br>${generateAIResponse(message)}`;
+                messagesContainer.appendChild(aiMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAIResponse(query) {
+            const responses = [
+                "Based on your current metrics, I recommend optimizing inventory management to reduce wastage by 15%, which could increase monthly profit by ₹12,000.",
+                "Your cafe's 34% profit margin is excellent! Consider expanding your menu during peak hours to capture additional revenue of ₹8,000/month.",
+                "The data shows your busiest hours are 8-10 AM and 6-8 PM. Implementing dynamic pricing during these periods could boost revenue by 12%.",
+                "Your operational efficiency of 87/100 is outstanding. Focus on customer retention strategies to maintain this growth trajectory.",
+                "Market analysis suggests a strategic seating expansion of 5 seats could generate an additional ₹1,240/day with a 3.4-month payback period."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateReport() {
+            document.getElementById('reportContent').style.display = 'block';
+            document.getElementById('reportContent').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Handle Enter key in chat
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ArthSethu Demo loaded successfully');
+        });
+    </script>
+</body>
+</html>
