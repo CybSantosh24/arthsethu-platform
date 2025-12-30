@@ -2,7 +2,7 @@ services:
   # Main ArthSethu Spring Boot Application
   - type: web
     name: arthsethu-platform
-    runtime: java
+    env: java
     plan: free
     region: oregon
     branch: main
