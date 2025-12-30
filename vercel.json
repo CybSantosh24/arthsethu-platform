@@ -1,0 +1,55 @@
+{
+  "version": 2,
+  "name": "arthsethu-platform",
+  "builds": [
+    {
+      "src": "DEMO_FIXED.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "WORKING_DEMO.html", 
+      "use": "@vercel/static"
+    },
+    {
+      "src": "demo-standalone.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/DEMO_FIXED.html"
+    },
+    {
+      "src": "/demo",
+      "dest": "/DEMO_FIXED.html"
+    },
+    {
+      "src": "/working-demo",
+      "dest": "/WORKING_DEMO.html"
+    },
+    {
+      "src": "/standalone",
+      "dest": "/demo-standalone.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
